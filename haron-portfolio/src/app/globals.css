@@ -1,0 +1,104 @@
+@import "tailwindcss";
+
+:root {
+  --background: #02030a;
+  --foreground: #f8fbff;
+  --font-primary: var(--font-geist-sans);
+  --font-arabic-stack: var(--font-cairo), var(--font-ibm-arabic), var(--font-tajawal);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-primary);
+  --font-mono: var(--font-geist-mono);
+  --font-arabic: var(--font-arabic-stack);
+  --animate-spin-slow: spin 18s linear infinite;
+  --animate-float: float 7s ease-in-out infinite;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  background: var(--background);
+}
+
+html[dir="rtl"] {
+  --font-primary: var(--font-arabic-stack);
+}
+
+body {
+  min-height: 100vh;
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-primary), system-ui, sans-serif;
+  cursor: default;
+}
+
+::selection {
+  background: rgba(34, 211, 238, 0.35);
+  color: white;
+}
+
+a,
+button {
+  cursor: pointer;
+}
+
+.font-arabic {
+  font-family: var(--font-arabic-stack), system-ui, sans-serif;
+}
+
+.snap-section {
+  scroll-snap-align: start;
+  scroll-margin-top: 5rem;
+}
+
+.futuristic-grid {
+  background-image:
+    linear-gradient(rgba(34, 211, 238, 0.18) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(34, 211, 238, 0.18) 1px, transparent 1px);
+  background-size: 64px 64px;
+  mask-image: radial-gradient(circle at center, black 0%, transparent 72%);
+}
+
+.hologram-grid {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+.glass-noise::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.15;
+  background-image: radial-gradient(circle at 30% 20%, white 0 1px, transparent 1px);
+  background-size: 18px 18px;
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(0, -16px, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}
