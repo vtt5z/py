@@ -23,7 +23,7 @@ const getModel = () => {
   const genAI = getGenAI();
 
   return genAI.getGenerativeModel({
-    model: "gemini-1.5-flash-latest",
+    model: "gemini-3-flash-preview",
   });
 };
 
@@ -48,7 +48,7 @@ function formatMessagesAsPrompt(messages: ChatMessage[]): string {
 }
 
 /**
- * Create ReadableStream response
+ * Create stream response
  */
 function createStreamResponse(
   text: string,
@@ -172,7 +172,7 @@ export async function completeText(
 }
 
 /**
- * Vision / Image Analysis
+ * Analyze image using Gemini Vision
  */
 export async function analyzeImage(
   base64: string,
