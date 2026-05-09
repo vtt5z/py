@@ -17,18 +17,18 @@ const getGenAI = () => {
 };
 
 /**
- * Get Gemini 1.5 Flash model instance
+ * Get Gemini model instance
  */
 const getModel = () => {
   const genAI = getGenAI();
 
   return genAI.getGenerativeModel({
-    model: "gemini-1.5-flash",
+    model: "gemini-1.5-flash-latest",
   });
 };
 
 /**
- * Convert chat messages to Gemini format and combine into a prompt
+ * Convert chat messages to Gemini format
  */
 function formatMessagesAsPrompt(messages: ChatMessage[]): string {
   return messages
@@ -48,7 +48,7 @@ function formatMessagesAsPrompt(messages: ChatMessage[]): string {
 }
 
 /**
- * Create a streaming response compatible with ReadableStream
+ * Create ReadableStream response
  */
 function createStreamResponse(
   text: string,
@@ -64,7 +64,7 @@ function createStreamResponse(
 }
 
 /**
- * Chat completion with streaming-like response
+ * AI Chat Completion
  */
 export async function streamChatCompletion(
   messages: ChatMessage[],
@@ -72,7 +72,7 @@ export async function streamChatCompletion(
   try {
     if (!process.env.GEMINI_API_KEY) {
       return createStreamResponse(
-        "HARON OS is in demo mode. Add GEMINI_API_KEY to enable AI responses.",
+        "HARON OS is running in demo mode. Add GEMINI_API_KEY to enable AI.",
       );
     }
 
@@ -92,7 +92,7 @@ export async function streamChatCompletion(
         : "Unknown error occurred";
 
     console.error(
-      "[Gemini 1.5 Chat Error]",
+      "[HARON OS Gemini Error]",
       errorMessage,
     );
 
@@ -106,6 +106,15 @@ export async function streamChatCompletion(
       );
     }
 
+    if (
+      errorMessage.includes("404") ||
+      errorMessage.includes("not found")
+    ) {
+      return createStreamResponse(
+        "HARON OS AI model configuration error. Please verify Gemini API setup.",
+      );
+    }
+
     return createStreamResponse(
       `Error: Unable to process request - ${errorMessage}`,
     );
@@ -113,7 +122,7 @@ export async function streamChatCompletion(
 }
 
 /**
- * Complete text generation (non-streaming)
+ * Complete text generation
  */
 export async function completeText(
   prompt: string,
@@ -124,7 +133,7 @@ export async function completeText(
       return [
         "## HARON OS Demo Mode",
         "",
-        "Gemini API is not configured. Add `GEMINI_API_KEY` to activate this feature.",
+        "Gemini API is not configured.",
         "",
         "### Your Request:",
         prompt,
@@ -139,9 +148,7 @@ export async function completeText(
 
     const result = await model.generateContent(fullPrompt);
 
-    const responseText = result.response.text();
-
-    return responseText;
+    return result.response.text();
   } catch (error) {
     const errorMessage =
       error instanceof Error
@@ -149,26 +156,23 @@ export async function completeText(
         : "Unknown error occurred";
 
     console.error(
-      "[Gemini 1.5 Complete Error]",
+      "[HARON OS Complete Error]",
       errorMessage,
     );
 
     if (
       errorMessage.includes("429") ||
-      errorMessage.includes("quota") ||
-      errorMessage.includes("Too Many Requests")
+      errorMessage.includes("quota")
     ) {
       return "HARON OS AI is temporarily busy. Please try again shortly.";
     }
 
-    throw new Error(
-      `Gemini 1.5 API error: ${errorMessage}`,
-    );
+    return `Gemini Error: ${errorMessage}`;
   }
 }
 
 /**
- * Analyze image using Gemini Vision
+ * Vision / Image Analysis
  */
 export async function analyzeImage(
   base64: string,
@@ -177,9 +181,7 @@ export async function analyzeImage(
 ): Promise<string> {
   try {
     if (!process.env.GEMINI_API_KEY) {
-      return `## HARON OS Vision Demo
-
-Gemini Vision is ready. Add \`GEMINI_API_KEY\` to analyze screenshots with AI.`;
+      return "Gemini Vision is not configured.";
     }
 
     const model = getModel();
@@ -191,31 +193,12 @@ Gemini Vision is ready. Add \`GEMINI_API_KEY\` to analyze screenshots with AI.`;
       },
     };
 
-    const systemMessage = `
-You are HARON OS vision analyst.
-
-Analyze screenshots with practical engineering and UI debugging guidance.
-
-Focus on:
-- Visual errors
-- UI problems
-- Performance issues
-- Accessibility concerns
-- Practical solutions
-
-Be concise and actionable.
-`;
-
     const result = await model.generateContent([
-      systemMessage,
-      "\n\nAnalyze this screenshot:\n",
       prompt,
       imageData,
     ] as any);
 
-    const responseText = result.response.text();
-
-    return responseText;
+    return result.response.text();
   } catch (error) {
     const errorMessage =
       error instanceof Error
@@ -223,26 +206,16 @@ Be concise and actionable.
         : "Unknown error occurred";
 
     console.error(
-      "[Gemini 1.5 Vision Error]",
+      "[HARON OS Vision Error]",
       errorMessage,
     );
 
-    if (
-      errorMessage.includes("429") ||
-      errorMessage.includes("quota") ||
-      errorMessage.includes("Too Many Requests")
-    ) {
-      return "HARON OS Vision AI is temporarily busy. Please try again shortly.";
-    }
-
-    throw new Error(
-      `Gemini Vision error: ${errorMessage}`,
-    );
+    return `Vision Error: ${errorMessage}`;
   }
 }
 
 /**
- * Health check for Gemini API
+ * Health Check
  */
 export async function checkGeminiConnection(): Promise<boolean> {
   try {
