@@ -1,13 +1,13 @@
 # HARON OS
 
-A premium AI-powered digital operating system experience built with Next.js 14, TypeScript, Tailwind CSS, Framer Motion, GSAP, Three.js, Lenis, shadcn-style primitives, OpenAI-ready API routes, and Supabase-ready services.
+A premium AI-powered digital operating system experience built with Next.js 14, TypeScript, Tailwind CSS, Framer Motion, GSAP, Three.js, Lenis, shadcn-style primitives, Google Gemini AI API routes, and Supabase-ready services.
 
 ## Features
 
 - Cinematic HARON OS landing experience
-- Streaming AI chat assistant
+- Streaming AI chat assistant (powered by Google Gemini)
 - PDF AI summarizer API route
-- Screenshot analyzer API route
+- Screenshot analyzer API route with vision analysis
 - Resume builder and writing assistant
 - Developer tools: JSON formatter, regex tester, SQL generator, API tester, code explainer, error debugger
 - Student hub: PDF notes, quizzes, flashcards, presentation flow, study assistant
@@ -21,14 +21,14 @@ A premium AI-powered digital operating system experience built with Next.js 14, 
 Copy `.env.local.example` to `.env.local` and add keys:
 
 ```bash
-OPENAI_API_KEY=your_key
+GEMINI_API_KEY=your_gemini_api_key
 NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 ```
 
 `SUPABASE_SERVICE_ROLE_KEY` can also be added for server-side storage uploads.
 
-Without `OPENAI_API_KEY`, AI routes return polished local demo responses so the interface remains testable.
+Without `GEMINI_API_KEY`, AI routes return polished local demo responses so the interface remains testable.
 
 ## Getting Started
 

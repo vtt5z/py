@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 
-import { streamChatCompletion, type ChatMessage } from "@/services/openai";
+import { streamChatCompletion, type ChatMessage } from "@/services/gemini";
 import { checkUsageLimit } from "@/services/usage-limits";
 
 export const runtime = "nodejs";

@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 
-import { completeText } from "@/services/openai";
+import { completeText } from "@/services/gemini";
 import { checkUsageLimit } from "@/services/usage-limits";
 
 export async function POST(request: NextRequest) {

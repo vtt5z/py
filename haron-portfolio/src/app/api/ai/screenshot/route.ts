@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 
-import { analyzeImage } from "@/services/openai";
+import { analyzeImage } from "@/services/gemini";
 import { checkUsageLimit } from "@/services/usage-limits";
 
 export const runtime = "nodejs";

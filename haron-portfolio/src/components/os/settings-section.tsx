@@ -30,7 +30,7 @@ export function SettingsSection() {
           <div>
             <h3 className="text-2xl font-black text-white">Secure by default</h3>
             <p className="mt-3 max-w-4xl text-white/60">
-              API keys are never hardcoded. HARON OS reads secrets from environment variables, keeps OpenAI calls on server routes, and includes `.env.local.example` for deployment setup.
+              API keys are never hardcoded. HARON OS reads secrets from environment variables, keeps Gemini API calls on server routes, and includes `.env.local.example` for deployment setup.
             </p>
           </div>
         </div>
