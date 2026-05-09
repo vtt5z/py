@@ -1,5 +1,5 @@
-import { PortfolioExperience } from "@/components/portfolio-experience";
+import { HaronOSExperience } from "@/components/haron-os-experience";
 
 export default function Home() {
-  return <PortfolioExperience />;
+  return <HaronOSExperience />;
 }

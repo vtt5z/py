@@ -1,8 +1,37 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# HARON OS
+
+A premium AI-powered digital operating system experience built with Next.js 14, TypeScript, Tailwind CSS, Framer Motion, GSAP, Three.js, Lenis, shadcn-style primitives, OpenAI-ready API routes, and Supabase-ready services.
+
+## Features
+
+- Cinematic HARON OS landing experience
+- Streaming AI chat assistant
+- PDF AI summarizer API route
+- Screenshot analyzer API route
+- Resume builder and writing assistant
+- Developer tools: JSON formatter, regex tester, SQL generator, API tester, code explainer, error debugger
+- Student hub: PDF notes, quizzes, flashcards, presentation flow, study assistant
+- Ctrl+K command palette
+- AI terminal mode
+- Supabase client scaffolding for auth/storage
+- Usage-limit middleware helpers
+
+## Environment
+
+Copy `.env.example` to `.env.local` and add keys:
+
+```bash
+OPENAI_API_KEY=your_key
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+```
+
+Without `OPENAI_API_KEY`, AI routes return polished local demo responses so the interface remains testable.
 
 ## Getting Started
 
-First, run the development server:
+Run the development server:
 
 ```bash
 npm run dev

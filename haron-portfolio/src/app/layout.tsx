@@ -1,19 +1,19 @@
 import type { Metadata } from "next";
 import {
   Cairo,
-  Geist,
-  Geist_Mono,
   IBM_Plex_Sans_Arabic,
+  Inter,
+  Roboto_Mono,
   Tajawal,
 } from "next/font/google";
 import "./globals.css";
 
-const geistSans = Geist({
+const inter = Inter({
   variable: "--font-geist-sans",
   subsets: ["latin"],
 });
 
-const geistMono = Geist_Mono({
+const mono = Roboto_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
 });
@@ -39,9 +39,9 @@ const tajawal = Tajawal({
 });
 
 export const metadata: Metadata = {
-  title: "Haron Mohammed | Software Engineer & Data Analyst",
+  title: "HARON OS | AI Digital Operating System",
   description:
-    "A cinematic bilingual portfolio for Haron Mohammed, Software Engineer, Full Stack Developer, and Data Analyst.",
+    "A futuristic AI-powered digital operating system for engineering, analytics, learning, writing, and intelligent creation.",
   icons: {
     icon: "/favicon.ico",
   },
@@ -56,7 +56,7 @@ export default function RootLayout({
     <html
       lang="en"
       dir="ltr"
-      className={`${geistSans.variable} ${geistMono.variable} ${cairo.variable} ${ibmArabic.variable} ${tajawal.variable} h-full antialiased`}
+      className={`${inter.variable} ${mono.variable} ${cairo.variable} ${ibmArabic.variable} ${tajawal.variable} h-full antialiased`}
     >
       <body className="min-h-full overflow-x-hidden bg-[#02030a] text-white">
         {children}
