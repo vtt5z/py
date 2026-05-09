@@ -34,7 +34,7 @@ export function OSHero() {
             {["Enter Workspace", "Launch AI", "Open Tools"].map((label, index) => (
               <a
                 key={label}
-                href={index === 0 ? "#workspace" : index === 1 ? "#ai-assistant" : "#developer-tools"}
+                href={index === 0 ? "/workspace" : index === 1 ? "/ai" : "/tools"}
                 className="group inline-flex h-12 items-center gap-2 rounded-full border border-white/10 bg-white/[0.06] px-5 text-sm font-black text-white backdrop-blur-xl transition hover:border-cyan-200/60 hover:bg-cyan-300 hover:text-slate-950"
               >
                 {label}

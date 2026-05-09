@@ -18,14 +18,15 @@ A premium AI-powered digital operating system experience built with Next.js 14, 
 
 ## Environment
 
-Copy `.env.example` to `.env.local` and add keys:
+Copy `.env.local.example` to `.env.local` and add keys:
 
 ```bash
 OPENAI_API_KEY=your_key
 NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
-SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
 ```
+
+`SUPABASE_SERVICE_ROLE_KEY` can also be added for server-side storage uploads.
 
 Without `OPENAI_API_KEY`, AI routes return polished local demo responses so the interface remains testable.
 

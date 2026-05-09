@@ -13,6 +13,7 @@ import {
   FileText,
   FlaskConical,
   Gauge,
+  Home,
   Globe2,
   GraduationCap,
   ImageUp,
@@ -27,6 +28,8 @@ import {
   ShieldCheck,
   Sparkles,
   TerminalSquare,
+  Settings,
+  UserRound,
   WandSparkles,
   Zap,
 } from "lucide-react";
@@ -148,13 +151,20 @@ export const terminalCommands = [
 ];
 
 export const commandPaletteItems = [
-  { label: "Launch AI Chat", target: "#ai-assistant", icon: Bot },
-  { label: "Summarize PDF", target: "#ai-tools", icon: FileSearch },
-  { label: "Analyze Screenshot", target: "#ai-tools", icon: ImageUp },
-  { label: "Open Developer Tools", target: "#developer-tools", icon: Code2 },
-  { label: "Open Student Hub", target: "#student-hub", icon: GraduationCap },
-  { label: "Enter Terminal Mode", target: "#terminal", icon: TerminalSquare },
-  { label: "Contact Haron", target: "#contact", icon: Mail },
+  { label: "Home", target: "/", icon: Home },
+  { label: "AI Assistant", target: "/ai", icon: Bot },
+  { label: "AI Tools", target: "/tools", icon: WandSparkles },
+  { label: "Workspace", target: "/workspace", icon: LayoutDashboard },
+  { label: "Student Hub", target: "/student", icon: GraduationCap },
+  { label: "Developer Mode", target: "/developer", icon: Code2 },
+  { label: "Dashboard", target: "/dashboard", icon: Gauge },
+  { label: "Terminal", target: "/terminal", icon: TerminalSquare },
+  { label: "Settings", target: "/settings", icon: Settings },
+  { label: "About Haron", target: "/about", icon: UserRound },
+  { label: "Projects", target: "/projects", icon: Rocket },
+  { label: "Contact", target: "/contact", icon: Mail },
+  { label: "Summarize PDF Action", target: "/tools#pdf", icon: FileSearch },
+  { label: "Analyze Screenshot Action", target: "/tools#screenshot", icon: ImageUp },
 ];
 
 export const systemSignals = [
@@ -166,4 +176,60 @@ export const systemSignals = [
   { label: "AI memory hooks", icon: Cpu },
   { label: "Live dashboards", icon: Activity },
   { label: "Production architecture", icon: BadgeCheck },
+];
+
+export const platformPages = [
+  { title: "AI", href: "/ai", icon: Bot, text: "Chat, PDF intelligence, screenshot analysis, writing, and resume generation." },
+  { title: "Tools", href: "/tools", icon: WandSparkles, text: "Unified smart utilities for documents, screenshots, writing, and generation." },
+  { title: "Workspace", href: "/workspace", icon: LayoutDashboard, text: "The central operating surface for HARON OS modules and live systems." },
+  { title: "Student", href: "/student", icon: GraduationCap, text: "Study plans, flashcards, notes, quiz flows, and presentation support." },
+  { title: "Developer", href: "/developer", icon: Code2, text: "JSON, SQL, regex, APIs, code explanation, and debugging." },
+  { title: "Dashboard", href: "/dashboard", icon: Gauge, text: "AI statistics, activity, usage signals, and system monitoring widgets." },
+  { title: "Terminal", href: "/terminal", icon: TerminalSquare, text: "Command-first AI mode for fast futuristic workflows." },
+  { title: "Settings", href: "/settings", icon: Settings, text: "Environment, Supabase, OpenAI, storage, and deployment readiness." },
+  { title: "About", href: "/about", icon: UserRound, text: "Haron Mohammed, software engineering, analytics, and platform vision." },
+  { title: "Projects", href: "/projects", icon: Rocket, text: "AI platform, analytics, healthcare, e-commerce, and visual systems." },
+  { title: "Contact", href: "/contact", icon: Mail, text: "Professional contact signal and social links." },
+];
+
+export const dashboardSeries = [
+  { name: "Mon", ai: 42, tools: 28, study: 18 },
+  { name: "Tue", ai: 58, tools: 36, study: 24 },
+  { name: "Wed", ai: 71, tools: 45, study: 39 },
+  { name: "Thu", ai: 66, tools: 52, study: 44 },
+  { name: "Fri", ai: 84, tools: 64, study: 57 },
+  { name: "Sat", ai: 96, tools: 72, study: 63 },
+];
+
+export const projectSystems = [
+  {
+    title: "HARON OS AI Platform",
+    text: "A cinematic digital operating system with AI tools, dashboard, terminal, and command palette.",
+    stack: ["Next.js", "OpenAI", "Supabase", "Framer Motion"],
+  },
+  {
+    title: "Healthcare Intelligence System",
+    text: "Real-time care workflows, patient signals, operational views, and secure dashboards.",
+    stack: ["Flutter", "Firebase", "Python", "Analytics"],
+  },
+  {
+    title: "Power BI Analytics Command Center",
+    text: "Business intelligence interface for raw data, KPIs, charts, and executive summaries.",
+    stack: ["Power BI", "SQL", "Python", "DAX"],
+  },
+  {
+    title: "Forex Data Experience",
+    text: "Trading companion with market signals, risk panels, and financial visualizations.",
+    stack: ["Flutter", "REST APIs", "Charts", "Firebase"],
+  },
+  {
+    title: "E-Commerce Operations Platform",
+    text: "Premium storefront, admin workflows, product flows, and conversion-focused interface.",
+    stack: ["Next.js", "APIs", "UI/UX", "SQL"],
+  },
+  {
+    title: "AI Visualization Lab",
+    text: "Interactive visual systems for predictive analytics, AI explainability, and data stories.",
+    stack: ["Three.js", "ML", "Data Viz", "TypeScript"],
+  },
 ];

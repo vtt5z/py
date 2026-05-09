@@ -2,6 +2,7 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import { Search, X } from "lucide-react";
+import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 
 import { commandPaletteItems } from "@/lib/haron-os-content";
@@ -71,7 +72,7 @@ export function CommandPalette() {
               </div>
               <div className="max-h-[25rem] overflow-y-auto p-3">
                 {filtered.map((item) => (
-                  <a
+                  <Link
                     key={item.label}
                     href={item.target}
                     onClick={() => setOpen(false)}
@@ -79,7 +80,7 @@ export function CommandPalette() {
                   >
                     <item.icon className="size-5" />
                     <span className="font-semibold">{item.label}</span>
-                  </a>
+                  </Link>
                 ))}
               </div>
             </motion.div>
