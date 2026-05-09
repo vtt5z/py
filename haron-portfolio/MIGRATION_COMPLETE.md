@@ -7,7 +7,7 @@
 
 ## Executive Summary
 
-HARON OS has been **completely migrated** from OpenAI API to Google Gemini API. All AI components now use `@google/generative-ai` with `gemini-1.5-flash` model.
+HARON OS has been **completely migrated** from OpenAI API to Google Gemini API. All AI components now use `@google/generative-ai` with `gemini-2.0-flash` model.
 
 **Key Achievement**: All AI features working with modern, scalable Gemini architecture.
 
@@ -165,7 +165,7 @@ export type ChatMessage = {
 ### Features
 
 ✅ **Streaming Simulation**: Non-streaming API response wrapped in ReadableStream for frontend compatibility  
-✅ **Vision Support**: Screenshot analysis with `gemini-1.5-flash`  
+✅ **Vision Support**: Screenshot analysis with `gemini-2.0-flash`  
 ✅ **Error Handling**: Comprehensive try-catch with informative messages  
 ✅ **API Key Validation**: Checked before each request  
 ✅ **Demo Mode**: Returns polished responses when API key missing  

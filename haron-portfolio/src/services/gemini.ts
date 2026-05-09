@@ -14,9 +14,13 @@ const getGenAI = () => {
   return new GoogleGenerativeAI(apiKey);
 };
 
+/**
+ * Get Gemini 2.0 Flash model instance
+ * This is the current stable model with excellent performance
+ */
 const getModel = () => {
   const genAI = getGenAI();
-  return genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+  return genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 };
 
 /**
@@ -51,7 +55,7 @@ function createStreamResponse(text: string): ReadableStream<Uint8Array> {
 
 /**
  * Chat completion with streaming-like response
- * Gemini 1.5 Flash API is fast enough to feel real-time
+ * Gemini 2.0 Flash API provides fast, reliable responses
  */
 export async function streamChatCompletion(
   messages: ChatMessage[]
@@ -73,7 +77,7 @@ export async function streamChatCompletion(
     return createStreamResponse(responseText);
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
-    console.error("[Gemini Chat Error]", errorMessage);
+    console.error("[Gemini 2.0 Chat Error]", errorMessage);
     return createStreamResponse(
       `Error: Unable to process request - ${errorMessage}`
     );
@@ -112,8 +116,8 @@ export async function completeText(
     return responseText;
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
-    console.error("[Gemini Complete Error]", errorMessage);
-    throw new Error(`Gemini API error: ${errorMessage}`);
+    console.error("[Gemini 2.0 Complete Error]", errorMessage);
+    throw new Error(`Gemini 2.0 API error: ${errorMessage}`);
   }
 }
 
@@ -161,8 +165,8 @@ Be concise and actionable.`;
     return responseText;
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
-    console.error("[Gemini Vision Error]", errorMessage);
-    throw new Error(`Gemini Vision error: ${errorMessage}`);
+    console.error("[Gemini 2.0 Vision Error]", errorMessage);
+    throw new Error(`Gemini 2.0 Vision error: ${errorMessage}`);
   }
 }
 
