@@ -9,7 +9,9 @@ export type ChatMessage = {
 
 export type AssistantLanguage = "en" | "ar";
 
-const GEMINI_MODEL = "gemini-1.5-flash";
+const GEMINI_MODEL =
+  process.env.GEMINI_MODEL?.trim() ||
+  "gemini-3-flash-preview";
 
 function getApiKey() {
   return process.env.GEMINI_API_KEY?.trim();
@@ -74,6 +76,7 @@ export function buildAssistantSystemPrompt(language: AssistantLanguage) {
   if (language === "ar") {
     return [
       shared,
+      "In Arabic mode, localize the product name as: هارون أو إس.",
       "Respond in modern Arabic with a natural Saudi-friendly tone.",
       "Use RTL-friendly structure, clear wording, and professional app terminology.",
       "Keep the tone premium, calm, and useful.",
@@ -115,11 +118,11 @@ function messagesToPrompt(messages: ChatMessage[], language: AssistantLanguage) 
 function demoResponse(prompt: string, language: AssistantLanguage) {
   if (language === "ar") {
     return [
-      "## وضع التجربة في HARON OS",
+      "## وضع التجربة في هارون أو إس",
       "",
       "Gemini غير مفعّل حالياً لأن `GEMINI_API_KEY` غير موجود في البيئة.",
       "",
-      "بمجرد إضافة المفتاح، سيعمل المساعد مباشرة بنفس الواجهة الحالية.",
+      "بمجرد إضافة المفتاح، يشتغل المساعد مباشرة بنفس التجربة الحالية.",
       "",
       "### طلبك",
       prompt.slice(0, 500),
@@ -168,7 +171,9 @@ export async function streamChatCompletion(
       },
     });
   } catch (error) {
-    return createTextStream(formatGeminiError(error, language));
+    console.error("[HARON OS Gemini streaming fallback]", error);
+    const fallback = await completeText(messages.at(-1)?.content ?? prompt, undefined, language);
+    return createTextStream(fallback);
   }
 }
 
@@ -190,6 +195,7 @@ export async function completeText(prompt: string, systemPrompt?: string, langua
     const result = await getModel().generateContent(fullPrompt);
     return result.response.text();
   } catch (error) {
+    console.error("[HARON OS Gemini complete error]", error);
     return formatGeminiError(error, language);
   }
 }
@@ -242,7 +248,7 @@ function formatGeminiError(error: unknown, language: AssistantLanguage) {
 
   if (/429|quota|too many requests/i.test(message)) {
     return language === "ar"
-      ? "HARON OS مشغول حالياً بسبب حد الاستخدام. جرّب مرة ثانية بعد قليل."
+      ? "هارون أو إس مشغول حالياً بسبب حد الاستخدام. جرّب مرة ثانية بعد قليل."
       : "HARON OS is temporarily rate-limited. Please try again shortly.";
   }
 
@@ -254,11 +260,11 @@ function formatGeminiError(error: unknown, language: AssistantLanguage) {
 
   if (/model|not found|404/i.test(message)) {
     return language === "ar"
-      ? "إعداد نموذج Gemini غير صحيح. HARON OS يستخدم `gemini-1.5-flash`."
-      : "Gemini model configuration failed. HARON OS is configured for `gemini-1.5-flash`.";
+      ? `إعداد نموذج Gemini غير صحيح. هارون أو إس يستخدم \`${GEMINI_MODEL}\`.`
+      : `Gemini model configuration failed. HARON OS is configured for \`${GEMINI_MODEL}\`.`;
   }
 
   return language === "ar"
-    ? `تعذر تنفيذ الطلب حالياً: ${message}`
-    : `HARON OS could not complete the request: ${message}`;
+    ? "تعذر تنفيذ الطلب حالياً. جرّب مرة ثانية بعد لحظات."
+    : "HARON OS could not complete the request. Please try again in a moment.";
 }

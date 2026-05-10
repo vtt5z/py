@@ -3,14 +3,19 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowRight, Bot, Command, TerminalSquare } from "lucide-react";
 
+import { useLanguage } from "@/components/providers/language-provider";
 import { useRotatingText } from "@/hooks/use-rotating-text";
 import { osMetrics, rotatingCommands } from "@/lib/haron-os-content";
+import { cn } from "@/lib/utils";
 
 export function OSHero() {
+  const { lang, dir } = useLanguage();
   const suggestion = useRotatingText(rotatingCommands, 1500);
+  const brand = lang === "ar" ? "هارون" : "HARON";
+  const os = lang === "ar" ? "أو إس" : "OS";
 
   return (
-    <section id="hero" className="relative z-10 flex min-h-screen items-center px-5 pb-16 pt-32 sm:px-8 lg:px-10">
+    <section id="hero" className={cn("relative z-10 flex min-h-screen items-center px-5 pb-16 pt-32 sm:px-8 lg:px-10", dir === "rtl" && "font-arabic text-right")}>
       <div className="mx-auto grid w-full max-w-7xl items-center gap-10 lg:grid-cols-[1.02fr_0.98fr]">
         <motion.div
           initial={{ opacity: 0, x: -46, filter: "blur(16px)" }}
@@ -19,19 +24,21 @@ export function OSHero() {
         >
           <div className="mb-8 inline-flex items-center gap-3 rounded-full border border-cyan-200/20 bg-white/[0.04] px-4 py-2 text-sm font-semibold text-cyan-100/80 backdrop-blur-xl">
             <span className="size-2 rounded-full bg-emerald-300 shadow-[0_0_18px_rgba(110,231,183,0.9)]" />
-            AI Workspace online • Secure routes ready • Supabase connected layer
+            {lang === "ar" ? "مساحة العمل جاهزة • Gemini متصل • Supabase جاهز" : "AI Workspace online • Gemini routes ready • Supabase connected layer"}
           </div>
           <h1 className="max-w-5xl text-6xl font-black leading-[0.86] tracking-tight text-white sm:text-8xl lg:text-9xl">
-            HARON
+            {brand}
             <span className="block bg-gradient-to-r from-cyan-100 via-white to-violet-200 bg-clip-text text-transparent">
-              OS
+              {os}
             </span>
           </h1>
           <p className="mt-7 max-w-3xl text-xl font-semibold leading-8 text-white/70 sm:text-2xl">
-            A premium AI-powered digital operating system for engineering, analytics, learning, writing, and intelligent creation.
+            {lang === "ar"
+              ? "نظام تشغيل ذكي وفاخر للإنتاجية، البرمجة، التحليل، الدراسة، والكتابة باحتراف."
+              : "A premium AI-powered digital operating system for engineering, analytics, learning, writing, and intelligent creation."}
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
-            {["Enter Workspace", "Launch AI", "Open Tools"].map((label, index) => (
+            {(lang === "ar" ? ["مساحة العمل", "شغّل المساعد", "افتح الأدوات"] : ["Enter Workspace", "Launch AI", "Open Tools"]).map((label, index) => (
               <a
                 key={label}
                 href={index === 0 ? "/workspace" : index === 1 ? "/ai" : "/tools"}
@@ -46,7 +53,7 @@ export function OSHero() {
           <div className="mt-8 max-w-2xl rounded-[1.5rem] border border-cyan-200/20 bg-black/35 p-4 shadow-[0_0_70px_rgba(34,211,238,0.11)] backdrop-blur-2xl">
             <div className="flex items-center gap-3 text-white/45">
               <Command className="size-4 text-cyan-100" />
-              <span className="font-mono text-sm">Ask HARON OS...</span>
+              <span className="font-mono text-sm">{lang === "ar" ? "اسأل هارون أو إس..." : "Ask HARON OS..."}</span>
             </div>
             <div className="mt-3 flex min-h-12 items-center rounded-2xl border border-white/10 bg-white/[0.04] px-4">
               <AnimatePresence mode="wait">
@@ -80,7 +87,7 @@ export function OSHero() {
                 <span className="size-3 rounded-full bg-emerald-300/80" />
               </div>
               <span className="font-mono text-xs uppercase tracking-[0.3em] text-cyan-100/60">
-                AI Command Deck
+                {lang === "ar" ? "لوحة الأوامر الذكية" : "AI Command Deck"}
               </span>
             </div>
             <div className="relative mt-5 grid aspect-[1.16] place-items-center overflow-hidden rounded-3xl border border-cyan-200/15 bg-[#030712]">
@@ -98,7 +105,7 @@ export function OSHero() {
                 <p className="text-2xl font-black text-white">armed</p>
               </div>
               <div className="grid size-36 place-items-center rounded-[2rem] border border-cyan-200/30 bg-cyan-200/10 text-4xl font-black tracking-[0.16em] text-cyan-100 shadow-[0_0_60px_rgba(34,211,238,0.35)]">
-                HM
+                {lang === "ar" ? "هـ" : "HM"}
               </div>
             </div>
             <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">

@@ -2,6 +2,8 @@
 
 import { CheckCircle2, DatabaseZap, KeyRound, LockKeyhole, UploadCloud } from "lucide-react";
 
+import { useLanguage } from "@/components/providers/language-provider";
+
 const settings = [
   { title: "Gemini API", value: "GEMINI_API_KEY", text: "Server-only key for chat, writing, PDF, screenshot, resume, and SQL generation.", icon: KeyRound },
   { title: "Supabase URL", value: "NEXT_PUBLIC_SUPABASE_URL", text: "Public project URL for auth and client-side services.", icon: DatabaseZap },
@@ -10,6 +12,8 @@ const settings = [
 ];
 
 export function SettingsSection() {
+  const { lang } = useLanguage();
+
   return (
     <section className="relative z-10 mx-auto max-w-7xl px-5 py-12 sm:px-8 lg:px-10">
       <div className="grid gap-5 lg:grid-cols-4">
@@ -30,7 +34,9 @@ export function SettingsSection() {
           <div>
             <h3 className="text-2xl font-black text-white">Secure by default</h3>
             <p className="mt-3 max-w-4xl text-white/60">
-              API keys are never hardcoded. HARON OS reads secrets from environment variables, keeps Gemini API calls on server routes, and includes `.env.local.example` for deployment setup.
+              {lang === "ar"
+                ? "مفاتيح API لا تُكتب داخل الكود. هارون أو إس يقرأ الأسرار من متغيرات البيئة ويشغّل Gemini من مسارات آمنة على الخادم."
+                : "API keys are never hardcoded. HARON OS reads secrets from environment variables, keeps Gemini API calls on server routes, and includes `.env.local.example` for deployment setup."}
             </p>
           </div>
         </div>

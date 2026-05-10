@@ -8,13 +8,13 @@ import { useLanguage } from "@/components/providers/language-provider";
 import { platformPages } from "@/lib/haron-os-content";
 
 const links = [
-  ["Workspace", "/workspace"],
-  ["AI", "/ai"],
-  ["Tools", "/tools"],
-  ["Developer", "/developer"],
-  ["Dashboard", "/dashboard"],
-  ["Terminal", "/terminal"],
-];
+  { en: "Workspace", ar: "مساحة العمل", href: "/workspace" },
+  { en: "AI", ar: "المساعد", href: "/ai" },
+  { en: "Tools", ar: "الأدوات", href: "/tools" },
+  { en: "Developer", ar: "المطور", href: "/developer" },
+  { en: "Dashboard", ar: "لوحة التحكم", href: "/dashboard" },
+  { en: "Terminal", ar: "الطرفية", href: "/terminal" },
+] as const;
 
 export function OSNavbar() {
   const { lang, toggleLanguage } = useLanguage();
@@ -32,18 +32,18 @@ export function OSNavbar() {
           <span className="grid size-10 place-items-center rounded-full border border-cyan-200/30 bg-cyan-300/10 text-cyan-100">
             <Cpu className="size-5" />
           </span>
-          <span className="text-sm font-black uppercase tracking-[0.28em] text-white">
-            HARON OS
+          <span className="text-sm font-black uppercase tracking-[0.22em] text-white">
+            {lang === "ar" ? "هارون أو إس" : "HARON OS"}
           </span>
         </Link>
         <div className="hidden items-center gap-1 lg:flex">
-          {links.map(([label, href]) => (
+          {links.map((item) => (
             <Link
-              key={label}
-              href={href}
+              key={item.href}
+              href={item.href}
               className="rounded-full px-4 py-2 text-sm font-semibold text-white/56 transition hover:bg-white/10 hover:text-cyan-100"
             >
-              {label}
+              {item[lang]}
             </Link>
           ))}
         </div>
@@ -60,7 +60,7 @@ export function OSNavbar() {
           className="inline-flex h-10 items-center gap-2 rounded-full border border-cyan-200/25 bg-cyan-300/10 px-4 text-sm font-bold text-cyan-100 transition hover:bg-cyan-300 hover:text-slate-950"
         >
           <Bot className="size-4" />
-          <span className="hidden sm:inline">Launch AI</span>
+          <span className="hidden sm:inline">{lang === "ar" ? "شغّل المساعد" : "Launch AI"}</span>
           <Command className="size-4 sm:hidden" />
         </Link>
       </nav>
@@ -75,7 +75,7 @@ export function OSNavbar() {
               <Link
                 key={item.href}
                 href={item.href}
-                title={item.title}
+                title={lang === "ar" ? localizePageTitle(item.title) : item.title}
                 className="grid size-11 shrink-0 place-items-center rounded-2xl text-white/52 transition hover:bg-cyan-300/10 hover:text-cyan-100"
               >
                 <item.icon className="size-5" />
@@ -94,4 +94,22 @@ export function OSNavbar() {
       </aside>
     </>
   );
+}
+
+function localizePageTitle(title: string) {
+  const map: Record<string, string> = {
+    AI: "المساعد",
+    Tools: "الأدوات",
+    Workspace: "مساحة العمل",
+    Student: "الطالب",
+    Developer: "المطور",
+    Dashboard: "لوحة التحكم",
+    Terminal: "الطرفية",
+    Settings: "الإعدادات",
+    About: "عن هارون",
+    Projects: "المشاريع",
+    Contact: "التواصل",
+  };
+
+  return map[title] ?? title;
 }

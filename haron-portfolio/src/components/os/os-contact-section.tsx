@@ -3,6 +3,7 @@
 import { Mail, MapPin, Phone, ShieldCheck } from "lucide-react";
 
 import { OSCard } from "@/components/os/os-card";
+import { useLanguage } from "@/components/providers/language-provider";
 
 const contacts = [
   { title: "Yemeni Nationality", text: "Elegant identity signal kept outside the hero.", icon: ShieldCheck },
@@ -12,6 +13,8 @@ const contacts = [
 ];
 
 export function OSContactSection() {
+  const { lang } = useLanguage();
+
   return (
     <section id="contact" className="relative z-10 mx-auto max-w-7xl px-5 py-28 sm:px-8 lg:px-10">
       <div className="mb-12 max-w-4xl">
@@ -19,7 +22,7 @@ export function OSContactSection() {
           Contact Signal
         </p>
         <h2 className="text-4xl font-black tracking-tight text-white sm:text-6xl">
-          Connect with the engineer behind HARON OS.
+          {lang === "ar" ? "تواصل مع المهندس خلف هارون أو إس." : "Connect with the engineer behind HARON OS."}
         </h2>
       </div>
       <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">

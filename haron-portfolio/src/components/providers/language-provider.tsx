@@ -28,6 +28,11 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     const stored = window.localStorage.getItem("haron-language") as Language | null;
     if (stored === "ar" || stored === "en") {
       setLang(stored);
+      return;
+    }
+
+    if (navigator.language.toLowerCase().startsWith("ar")) {
+      setLang("ar");
     }
   }, []);
 

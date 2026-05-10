@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { type LucideIcon } from "lucide-react";
 
+import { useLanguage } from "@/components/providers/language-provider";
 import { cn } from "@/lib/utils";
 
 export function PageHero({
@@ -20,6 +21,10 @@ export function PageHero({
   children?: React.ReactNode;
   compact?: boolean;
 }) {
+  const { lang } = useLanguage();
+  const localizedTitle = localizeBrand(title, lang);
+  const localizedText = localizeBrand(text, lang);
+
   return (
     <section
       className={cn(
@@ -38,10 +43,10 @@ export function PageHero({
             {eyebrow}
           </div>
           <h1 className="max-w-5xl text-5xl font-black leading-[0.9] tracking-tight text-white sm:text-7xl lg:text-8xl">
-            {title}
+            {localizedTitle}
           </h1>
           <p className="mt-7 max-w-3xl text-lg font-semibold leading-8 text-white/64 sm:text-xl">
-            {text}
+            {localizedText}
           </p>
         </motion.div>
         <motion.div
@@ -56,4 +61,8 @@ export function PageHero({
       </div>
     </section>
   );
+}
+
+function localizeBrand(value: string, lang: "en" | "ar") {
+  return lang === "ar" ? value.replaceAll("HARON OS", "هارون أو إس") : value;
 }
