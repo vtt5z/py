@@ -1,20 +1,50 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { Clock3, MessageSquare, NotebookPen, Sparkles } from "lucide-react";
 
 import { OSCard } from "@/components/os/os-card";
+import { useLanguage } from "@/components/providers/language-provider";
 import { systemSignals, workspaceModules } from "@/lib/haron-os-content";
+import { cn } from "@/lib/utils";
 
 export function WorkspaceSection() {
+  const { lang, dir } = useLanguage();
+  const quickActions =
+    lang === "ar"
+      ? [
+          ["اسأل المساعد", "ابدأ محادثة لحل مشكلة أو كتابة نص.", MessageSquare],
+          ["ملاحظات", "احفظ فكرة أو خطة عمل سريعة.", NotebookPen],
+          ["سجل المطالبات", "ارجع لأفكارك واستخدمها مرة ثانية.", Clock3],
+          ["إجراء سريع", "لخّص، ترجم، أو حلّل في خطوة واحدة.", Sparkles],
+        ]
+      : [
+          ["AI Chat", "Start a conversation to solve, write, or plan.", MessageSquare],
+          ["Notes", "Capture an idea, plan, or study point.", NotebookPen],
+          ["Prompt History", "Reuse useful prompts and workflows.", Clock3],
+          ["Quick Actions", "Summarize, translate, or analyze in one step.", Sparkles],
+        ];
+
   return (
-    <section id="workspace" className="relative z-10 mx-auto min-h-screen max-w-7xl px-5 py-28 sm:px-8 lg:px-10">
+    <section
+      id="workspace"
+      className={cn(
+        "relative z-10 mx-auto max-w-7xl px-5 py-20 sm:px-8 lg:px-10",
+        dir === "rtl" && "font-arabic text-right",
+      )}
+    >
       <div className="mb-12 max-w-3xl">
         <p className="mb-4 font-mono text-xs uppercase tracking-[0.38em] text-cyan-200/70">
-          Digital Operating System
+          {lang === "ar" ? "مساحة العمل" : "Workspace"}
         </p>
         <h2 className="text-4xl font-black tracking-tight text-white sm:text-6xl">
-          One workspace for AI creation, engineering, and study.
+          {lang === "ar" ? "كل ما تحتاجه في مساحة إنتاجية واحدة." : "One workspace for chat, tools, notes, and quick actions."}
         </h2>
+        <p className="mt-4 text-white/56">
+          {lang === "ar"
+            ? "واجهة مرتبة تساعدك تنتقل بين المساعد والأدوات والملاحظات بدون تشتيت."
+            : "A cleaner workflow layer that helps you move between assistant, tools, notes, and history without hunting through sections."}
+        </p>
       </div>
       <div className="grid gap-5 lg:grid-cols-4">
         {workspaceModules.map((module) => (
@@ -23,6 +53,15 @@ export function WorkspaceSection() {
               {module.status}
             </span>
           </OSCard>
+        ))}
+      </div>
+      <div className="mt-6 grid gap-3 md:grid-cols-2 lg:grid-cols-4">
+        {quickActions.map(([title, text, Icon]) => (
+          <div key={title as string} className="rounded-2xl border border-white/10 bg-black/24 p-4 backdrop-blur-xl">
+            <Icon className="mb-4 size-5 text-cyan-100" />
+            <p className="font-black text-white">{title as string}</p>
+            <p className="mt-2 text-sm leading-6 text-white/48">{text as string}</p>
+          </div>
         ))}
       </div>
       <motion.div

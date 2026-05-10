@@ -163,6 +163,12 @@ export function AIChatAssistant() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           language: nextLanguage,
+          context: {
+            locale: navigator.language,
+            timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+            localTime: new Date().toLocaleString(),
+            device: window.innerWidth < 768 ? "mobile" : "desktop",
+          },
           messages: [...payload, userMessage],
         }),
       });

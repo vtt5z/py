@@ -35,42 +35,42 @@ import {
 } from "lucide-react";
 
 export const rotatingCommands = [
-  "Summarize PDF",
-  "Fix Flutter Error",
-  "Generate Portfolio",
-  "Analyze Screenshot",
-  "Create Presentation",
+  "Summarize a PDF",
+  "Fix a Flutter error",
+  "Rewrite a message",
+  "Analyze a screenshot",
+  "Create study notes",
 ];
 
 export const osMetrics = [
-  { label: "AI modules", value: "18", detail: "workspace actions" },
-  { label: "Response mode", value: "Live", detail: "streaming ready" },
-  { label: "Tools online", value: "24/7", detail: "developer + student" },
-  { label: "System feel", value: "Elite", detail: "cinematic UI" },
+  { label: "AI tools", value: "18", detail: "organized workflows" },
+  { label: "Responses", value: "Live", detail: "Gemini ready" },
+  { label: "Workspace", value: "24/7", detail: "developer + student" },
+  { label: "Languages", value: "EN/AR", detail: "RTL supported" },
 ];
 
 export const workspaceModules = [
   {
     title: "AI Workspace",
-    text: "Command, write, analyze, generate, and reason through one immersive control surface.",
+    text: "Chat, write, analyze, and organize work from one clear workspace.",
     icon: LayoutDashboard,
     status: "Core OS",
   },
   {
     title: "Smart Utilities",
-    text: "Writing, resume, PDF, screenshot, and presentation helpers with AI-optimized prompts.",
+    text: "Writing, resume, PDF, screenshot, and study helpers with clear workflows.",
     icon: WandSparkles,
     status: "Creative AI",
   },
   {
     title: "Developer Tools",
-    text: "JSON, regex, SQL, API testing, code explanation, and debugging workflows.",
+    text: "JSON, regex, SQL, API testing, code explanation, and debugging.",
     icon: MessageSquareCode,
     status: "Engineering",
   },
   {
     title: "Student Hub",
-    text: "Study notes, quizzes, flashcards, simplified explanations, and learning plans.",
+    text: "Study notes, quizzes, flashcards, explanations, and learning plans.",
     icon: GraduationCap,
     status: "Learning",
   },
@@ -133,20 +133,20 @@ export const studentTools = [
 
 export const terminalCommands = [
   {
-    command: "summarize pdf --mode=exam-ready",
-    output: "Generated executive summary, 9 key points, 6 quiz questions, and a simplified explanation.",
+    command: "summarize pdf",
+    output: "Creates a short summary, key points, simple explanation, and quiz questions.",
   },
   {
-    command: "fix firebase auth error --stack=flutter",
-    output: "Detected auth state timing issue. Suggested listener guard, emulator check, and token refresh path.",
+    command: "fix firebase auth error",
+    output: "Explains likely causes, practical fixes, and how to verify the solution.",
   },
   {
-    command: "generate portfolio --style=ai-startup",
-    output: "Composed hero, dashboard modules, project cards, analytics layer, and contact signal system.",
+    command: "rewrite professional message",
+    output: "Turns rough text into a clear, polished message with the right tone.",
   },
   {
-    command: "explain sql join --level=student",
-    output: "Explained INNER, LEFT, RIGHT, and FULL joins with simple tables and practical examples.",
+    command: "explain sql joins",
+    output: "Explains joins with simple examples and when to use each one.",
   },
 ];
 
@@ -169,9 +169,9 @@ export const commandPaletteItems = [
 
 export const systemSignals = [
   { label: "Secure API routes", icon: ShieldCheck },
-  { label: "Gemini streaming", icon: Zap },
-  { label: "Supabase-ready", icon: DatabaseZap },
-  { label: "Vercel deployable", icon: Rocket },
+  { label: "Gemini responses", icon: Zap },
+  { label: "Supabase ready", icon: DatabaseZap },
+  { label: "Vercel ready", icon: Rocket },
   { label: "Usage limits", icon: Gauge },
   { label: "AI memory hooks", icon: Cpu },
   { label: "Live dashboards", icon: Activity },
@@ -181,11 +181,11 @@ export const systemSignals = [
 export const platformPages = [
   { title: "AI", href: "/ai", icon: Bot, text: "Chat, PDF intelligence, screenshot analysis, writing, and resume generation." },
   { title: "Tools", href: "/tools", icon: WandSparkles, text: "Unified smart utilities for documents, screenshots, writing, and generation." },
-  { title: "Workspace", href: "/workspace", icon: LayoutDashboard, text: "The central operating surface for HARON OS modules and live systems." },
+  { title: "Workspace", href: "/workspace", icon: LayoutDashboard, text: "The central workspace for chat, tools, notes, and quick actions." },
   { title: "Student", href: "/student", icon: GraduationCap, text: "Study plans, flashcards, notes, quiz flows, and presentation support." },
   { title: "Developer", href: "/developer", icon: Code2, text: "JSON, SQL, regex, APIs, code explanation, and debugging." },
   { title: "Dashboard", href: "/dashboard", icon: Gauge, text: "AI statistics, activity, usage signals, and system monitoring widgets." },
-  { title: "Terminal", href: "/terminal", icon: TerminalSquare, text: "Command-first AI mode for fast futuristic workflows." },
+  { title: "Terminal", href: "/terminal", icon: TerminalSquare, text: "Command-style shortcuts for frequent AI tasks." },
   { title: "Settings", href: "/settings", icon: Settings, text: "Environment, Supabase, Gemini, storage, and deployment readiness." },
   { title: "About", href: "/about", icon: UserRound, text: "Haron Mohammed, software engineering, analytics, and platform vision." },
   { title: "Projects", href: "/projects", icon: Rocket, text: "AI platform, analytics, healthcare, e-commerce, and visual systems." },

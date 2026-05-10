@@ -11,9 +11,9 @@ export default function ToolsPage() {
   return (
     <PageFrame>
       <PageHero
-        eyebrow="Smart Utility Deck"
-        title="AI tools with one cinematic control surface."
-        text="Upload PDFs, analyze screenshots, rewrite text, generate resumes, test utilities, and move between tasks with operating-system speed."
+        eyebrow="Tool Center"
+        title="AI tools organized by real work."
+        text="Upload PDFs, analyze screenshots, rewrite text, generate resumes, format JSON, generate SQL, and test API workflows from one clear product surface."
         icon={WandSparkles}
       >
         <div className="grid grid-cols-2 gap-3">

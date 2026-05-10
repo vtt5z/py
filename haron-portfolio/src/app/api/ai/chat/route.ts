@@ -21,6 +21,12 @@ export async function POST(request: NextRequest) {
 
     const body = (await request.json()) as {
       language?: AssistantLanguage;
+      context?: {
+        locale?: string;
+        timezone?: string;
+        localTime?: string;
+        device?: string;
+      };
       messages?: ChatMessage[];
     };
 
@@ -30,7 +36,13 @@ export async function POST(request: NextRequest) {
       {
         role: "system",
         content:
-          "You are the live HARON OS assistant. Keep responses concise, premium, warm, and product-grade. Format markdown cleanly.",
+          [
+            "You are the live HARON OS assistant.",
+            "Keep responses concise, practical, warm, and product-grade.",
+            "Avoid fake sci-fi theatrics and verbose filler.",
+            "Prefer useful steps, clear formatting, and direct answers.",
+            `Runtime context: locale=${body.context?.locale ?? "unknown"}, timezone=${body.context?.timezone ?? "unknown"}, localTime=${body.context?.localTime ?? "unknown"}, device=${body.context?.device ?? "unknown"}.`,
+          ].join(" "),
       },
       ...(body.messages ?? []),
     ];
