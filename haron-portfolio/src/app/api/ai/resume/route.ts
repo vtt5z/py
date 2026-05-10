@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 
-import { completeText } from "@/services/gemini";
+import { completeText, detectInputLanguage } from "@/services/gemini";
 import { checkUsageLimit } from "@/services/usage-limits";
 
 export async function POST(request: NextRequest) {
@@ -16,9 +16,11 @@ export async function POST(request: NextRequest) {
     targetRole?: string;
   };
 
+  const profile = body.profile ?? "";
   const result = await completeText(
-    `Target role: ${body.targetRole ?? "Software Engineer / Data Analyst"}\n\nProfile:\n${body.profile ?? ""}`,
+    `Target role: ${body.targetRole ?? "Software Engineer / Data Analyst"}\n\nProfile:\n${profile}`,
     "You are HARON OS resume builder. Create a modern ATS-friendly CV in markdown with headline, summary, skills, projects, experience, education, and measurable bullets. Keep it premium and truthful to the supplied profile.",
+    detectInputLanguage(profile),
   );
 
   return Response.json({ result, remaining: usage.remaining });

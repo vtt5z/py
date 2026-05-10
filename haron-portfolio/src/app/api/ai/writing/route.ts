@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 
-import { completeText } from "@/services/gemini";
+import { completeText, detectInputLanguage } from "@/services/gemini";
 import { checkUsageLimit } from "@/services/usage-limits";
 
 export async function POST(request: NextRequest) {
@@ -16,9 +16,11 @@ export async function POST(request: NextRequest) {
     input?: string;
   };
 
+  const input = body.input ?? "";
   const result = await completeText(
-    `Mode: ${body.mode ?? "professional rewrite"}\n\nText:\n${body.input ?? ""}`,
+    `Mode: ${body.mode ?? "professional rewrite"}\n\nText:\n${input}`,
     "You are HARON OS writing assistant. Produce polished, professional, high-signal writing. Include 2-3 variants when useful.",
+    detectInputLanguage(input),
   );
 
   return Response.json({ result, remaining: usage.remaining });

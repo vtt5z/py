@@ -1,38 +1,56 @@
 import { NextRequest } from "next/server";
 
-import { streamChatCompletion, type ChatMessage } from "@/services/gemini";
+import {
+  detectInputLanguage,
+  streamChatCompletion,
+  type AssistantLanguage,
+  type ChatMessage,
+} from "@/services/gemini";
 import { checkUsageLimit } from "@/services/usage-limits";
 
 export const runtime = "nodejs";
 
 export async function POST(request: NextRequest) {
-  const ip = request.ip ?? request.headers.get("x-forwarded-for") ?? "local";
-  const usage = checkUsageLimit(`chat:${ip}`, 40);
+  try {
+    const ip = request.ip ?? request.headers.get("x-forwarded-for") ?? "local";
+    const usage = checkUsageLimit(`chat:${ip}`, 40);
 
-  if (!usage.allowed) {
-    return Response.json({ error: "Usage limit reached. Try again later." }, { status: 429 });
+    if (!usage.allowed) {
+      return Response.json({ error: "Usage limit reached. Try again later." }, { status: 429 });
+    }
+
+    const body = (await request.json()) as {
+      language?: AssistantLanguage;
+      messages?: ChatMessage[];
+    };
+
+    const userText = body.messages?.filter((message) => message.role === "user").at(-1)?.content ?? "";
+    const language = body.language ?? detectInputLanguage(userText);
+    const messages: ChatMessage[] = [
+      {
+        role: "system",
+        content:
+          "You are the live HARON OS assistant. Keep responses concise, premium, warm, and product-grade. Format markdown cleanly.",
+      },
+      ...(body.messages ?? []),
+    ];
+
+    const stream = await streamChatCompletion(messages, language);
+
+    return new Response(stream, {
+      headers: {
+        "Content-Type": "text/plain; charset=utf-8",
+        "Cache-Control": "no-cache, no-transform",
+        "X-Usage-Remaining": String(usage.remaining),
+      },
+    });
+  } catch (error) {
+    const message =
+      error instanceof Error ? error.message : "HARON OS AI route failed.";
+
+    return new Response(message, {
+      status: 200,
+      headers: { "Content-Type": "text/plain; charset=utf-8" },
+    });
   }
-
-  const body = (await request.json()) as {
-    messages?: ChatMessage[];
-  };
-
-  const messages: ChatMessage[] = [
-    {
-      role: "system",
-      content:
-        "You are HARON OS, a premium AI operating system built for a software engineer and data analyst. Be concise, cinematic, technically sharp, helpful, and format answers with markdown. When code is useful, provide clean code blocks.",
-    },
-    ...(body.messages ?? []),
-  ];
-
-  const stream = await streamChatCompletion(messages);
-
-  return new Response(stream, {
-    headers: {
-      "Content-Type": "text/plain; charset=utf-8",
-      "Cache-Control": "no-cache, no-transform",
-      "X-Usage-Remaining": String(usage.remaining),
-    },
-  });
 }

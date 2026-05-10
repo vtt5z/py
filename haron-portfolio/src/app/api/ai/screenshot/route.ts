@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 
-import { analyzeImage } from "@/services/gemini";
+import { analyzeImage, detectInputLanguage } from "@/services/gemini";
 import { checkUsageLimit } from "@/services/usage-limits";
 
 export const runtime = "nodejs";
@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
 
   const arrayBuffer = await file.arrayBuffer();
   const base64 = Buffer.from(arrayBuffer).toString("base64");
-  const result = await analyzeImage(base64, file.type || "image/png", prompt);
+  const result = await analyzeImage(base64, file.type || "image/png", prompt, detectInputLanguage(prompt));
 
   return Response.json({ result, remaining: usage.remaining });
 }

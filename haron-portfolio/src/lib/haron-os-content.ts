@@ -169,7 +169,7 @@ export const commandPaletteItems = [
 
 export const systemSignals = [
   { label: "Secure API routes", icon: ShieldCheck },
-  { label: "OpenAI streaming", icon: Zap },
+  { label: "Gemini streaming", icon: Zap },
   { label: "Supabase-ready", icon: DatabaseZap },
   { label: "Vercel deployable", icon: Rocket },
   { label: "Usage limits", icon: Gauge },
@@ -186,7 +186,7 @@ export const platformPages = [
   { title: "Developer", href: "/developer", icon: Code2, text: "JSON, SQL, regex, APIs, code explanation, and debugging." },
   { title: "Dashboard", href: "/dashboard", icon: Gauge, text: "AI statistics, activity, usage signals, and system monitoring widgets." },
   { title: "Terminal", href: "/terminal", icon: TerminalSquare, text: "Command-first AI mode for fast futuristic workflows." },
-  { title: "Settings", href: "/settings", icon: Settings, text: "Environment, Supabase, OpenAI, storage, and deployment readiness." },
+  { title: "Settings", href: "/settings", icon: Settings, text: "Environment, Supabase, Gemini, storage, and deployment readiness." },
   { title: "About", href: "/about", icon: UserRound, text: "Haron Mohammed, software engineering, analytics, and platform vision." },
   { title: "Projects", href: "/projects", icon: Rocket, text: "AI platform, analytics, healthcare, e-commerce, and visual systems." },
   { title: "Contact", href: "/contact", icon: Mail, text: "Professional contact signal and social links." },
@@ -205,7 +205,7 @@ export const projectSystems = [
   {
     title: "HARON OS AI Platform",
     text: "A cinematic digital operating system with AI tools, dashboard, terminal, and command palette.",
-    stack: ["Next.js", "OpenAI", "Supabase", "Framer Motion"],
+    stack: ["Next.js", "Gemini", "Supabase", "Framer Motion"],
   },
   {
     title: "Healthcare Intelligence System",

@@ -26,7 +26,7 @@ NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 ```
 
-`SUPABASE_SERVICE_ROLE_KEY` can also be added for server-side storage uploads.
+`SUPABASE_SERVICE_ROLE_KEY` can also be added separately for server-side storage uploads.
 
 Without `GEMINI_API_KEY`, AI routes return polished local demo responses so the interface remains testable.
 

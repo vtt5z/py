@@ -12,11 +12,11 @@ export default function SettingsPage() {
       <PageHero
         eyebrow="Secure Configuration"
         title="Environment, storage, auth, and deployment readiness."
-        text="HARON OS is structured for OpenAI server routes, Supabase auth and storage, usage limits, and Vercel deployment without hardcoded secrets."
+        text="HARON OS is structured for Gemini server routes, Supabase auth and storage, usage limits, and Vercel deployment without hardcoded secrets."
         icon={Settings}
       >
         <div className="space-y-3 font-mono text-sm">
-          {["OPENAI_API_KEY", "NEXT_PUBLIC_SUPABASE_URL", "NEXT_PUBLIC_SUPABASE_ANON_KEY"].map((env) => (
+          {["GEMINI_API_KEY", "NEXT_PUBLIC_SUPABASE_URL", "NEXT_PUBLIC_SUPABASE_ANON_KEY"].map((env) => (
             <div key={env} className="rounded-2xl border border-white/10 bg-black/35 p-4 text-cyan-100">
               {env}=
             </div>

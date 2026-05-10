@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 
-import { completeText } from "@/services/gemini";
+import { completeText, detectInputLanguage } from "@/services/gemini";
 import { checkUsageLimit } from "@/services/usage-limits";
 
 export const runtime = "nodejs";
@@ -33,6 +33,7 @@ export async function POST(request: NextRequest) {
     return Response.json({ error: "Upload a PDF or paste text to summarize." }, { status: 400 });
   }
 
+  const language = detectInputLanguage(sourceText);
   const result = await completeText(
     sourceText.slice(0, 26000),
     [
@@ -41,6 +42,7 @@ export async function POST(request: NextRequest) {
       "Summary, Key Points, Simplified Explanation, Quiz Questions.",
       "Be useful for students and professionals.",
     ].join(" "),
+    language,
   );
 
   return Response.json({ result, remaining: usage.remaining });

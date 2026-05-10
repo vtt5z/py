@@ -3,7 +3,7 @@
 import { CheckCircle2, DatabaseZap, KeyRound, LockKeyhole, UploadCloud } from "lucide-react";
 
 const settings = [
-  { title: "OpenAI API", value: "OPENAI_API_KEY", text: "Server-only key for chat, writing, PDF, screenshot, resume, and SQL generation.", icon: KeyRound },
+  { title: "Gemini API", value: "GEMINI_API_KEY", text: "Server-only key for chat, writing, PDF, screenshot, resume, and SQL generation.", icon: KeyRound },
   { title: "Supabase URL", value: "NEXT_PUBLIC_SUPABASE_URL", text: "Public project URL for auth and client-side services.", icon: DatabaseZap },
   { title: "Supabase Anon Key", value: "NEXT_PUBLIC_SUPABASE_ANON_KEY", text: "Public anonymous key for client auth flows.", icon: LockKeyhole },
   { title: "Storage System", value: "Supabase Storage", text: "Ready for uploaded PDFs, screenshots, generated resumes, and user files.", icon: UploadCloud },
