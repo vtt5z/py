@@ -7,6 +7,8 @@ import {
   Tajawal,
 } from "next/font/google";
 import { createMetadata, createJsonLd } from "@/lib/seo";
+import { AuthProvider } from "@/components/providers/auth-provider";
+import { LanguageProvider } from "@/components/providers/language-provider";
 import "./globals.css";
 
 const inter = Inter({
@@ -65,7 +67,11 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-full overflow-x-hidden bg-[#02030a] text-white">
-        {children}
+        <AuthProvider>
+          <LanguageProvider>
+            {children}
+          </LanguageProvider>
+        </AuthProvider>
         {/* PRODUCTION: Vercel Analytics */}
         {process.env.NODE_ENV === "production" && (
           <>
