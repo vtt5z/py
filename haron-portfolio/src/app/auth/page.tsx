@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Mail, Chrome, LogIn, Loader2 } from "lucide-react";
+import { Mail, Globe, LogIn, Loader2 } from "lucide-react";
 import { useAuth } from "@/components/providers/auth-provider";
 import { useLanguage } from "@/components/providers/language-provider";
 import { cn } from "@/lib/utils";
@@ -198,7 +198,7 @@ export default function AuthPage() {
             {loading ? (
               <Loader2 className="w-5 h-5 animate-spin" />
             ) : (
-              <Chrome className="w-5 h-5" />
+              <Globe className="w-5 h-5" />
             )}
             {loading ? copy.signingIn : copy.google}
           </motion.button>
