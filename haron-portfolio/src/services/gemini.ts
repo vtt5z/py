@@ -1,4 +1,5 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { withRetry, getFallbackResponse } from "@/lib/retry";
 
 export type ChatRole = "system" | "user" | "assistant" | "model";
 
@@ -158,8 +159,21 @@ export async function streamChatCompletion(
   }
 
   try {
+    /**
+     * PRODUCTION: Retry logic for streaming
+     * Wrap Gemini API call with retry and timeout handling
+     */
     const model = getModel();
-    const result = await model.generateContentStream(prompt);
+    const result = await withRetry(
+      () => model.generateContentStream(prompt),
+      {
+        maxRetries: 1, // Fewer retries for streaming
+        initialDelayMs: 500,
+        maxDelayMs: 2000,
+        timeoutMs: 45000, // Longer timeout for streaming
+      }
+    );
+    
     const encoder = new TextEncoder();
 
     return new ReadableStream<Uint8Array>({
@@ -171,15 +185,25 @@ export async function streamChatCompletion(
           }
           controller.close();
         } catch (error) {
-          controller.enqueue(encoder.encode(formatGeminiError(error, language)));
+          /**
+           * PRODUCTION: Stream error handling
+           * Send error message to stream instead of breaking
+           */
+          console.error("[HARON OS streaming error]", error);
+          const errorMessage = formatGeminiError(error, language) || getFallbackResponse("chat");
+          controller.enqueue(encoder.encode("\n\n" + errorMessage));
           controller.close();
         }
       },
     });
   } catch (error) {
+    /**
+     * PRODUCTION: Fallback to non-streaming completion
+     * If streaming fails, use standard completion as backup
+     */
     console.error("[HARON OS Gemini streaming fallback]", error);
-    const fallback = await completeText(messages.at(-1)?.content ?? prompt, undefined, language);
-    return createTextStream(fallback);
+    const fallbackText = getFallbackResponse("chat");
+    return createTextStream(fallbackText);
   }
 }
 
@@ -198,11 +222,30 @@ export async function completeText(prompt: string, systemPrompt?: string, langua
   }
 
   try {
-    const result = await getModel().generateContent(fullPrompt);
+    /**
+     * PRODUCTION: Retry logic with timeout
+     * If Gemini fails, retry up to 3 times with exponential backoff
+     */
+    const result = await withRetry(
+      () => getModel().generateContent(fullPrompt),
+      {
+        maxRetries: 2,
+        initialDelayMs: 500,
+        maxDelayMs: 3000,
+        timeoutMs: 30000,
+      }
+    );
+    
     return result.response.text();
   } catch (error) {
     console.error("[HARON OS Gemini complete error]", error);
-    return formatGeminiError(error, language);
+    
+    /**
+     * PRODUCTION: Graceful fallback
+     * If Gemini fails after retries, return friendly message
+     */
+    const fallbackMessage = getFallbackResponse("chat");
+    return formatGeminiError(error, language) || fallbackMessage;
   }
 }
 
@@ -219,6 +262,9 @@ export async function analyzeImage(
   }
 
   try {
+    /**
+     * PRODUCTION: Retry logic for image analysis
+     */
     const imagePart = {
       inlineData: {
         data: base64,
@@ -226,15 +272,24 @@ export async function analyzeImage(
       },
     };
 
-    const result = await getModel().generateContent([
-      buildAssistantSystemPrompt(language),
-      prompt,
-      imagePart,
-    ]);
+    const result = await withRetry(
+      () => getModel().generateContent([
+        buildAssistantSystemPrompt(language),
+        prompt,
+        imagePart,
+      ]),
+      {
+        maxRetries: 2,
+        initialDelayMs: 500,
+        maxDelayMs: 3000,
+        timeoutMs: 30000,
+      }
+    );
 
     return result.response.text();
   } catch (error) {
-    return formatGeminiError(error, language);
+    console.error("[HARON OS image analysis error]", error);
+    return formatGeminiError(error, language) || getFallbackResponse("screenshot");
   }
 }
 

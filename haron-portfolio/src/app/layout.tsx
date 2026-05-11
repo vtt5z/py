@@ -6,6 +6,7 @@ import {
   Roboto_Mono,
   Tajawal,
 } from "next/font/google";
+import { createMetadata, createJsonLd } from "@/lib/seo";
 import "./globals.css";
 
 const inter = Inter({
@@ -38,14 +39,10 @@ const tajawal = Tajawal({
   display: "swap",
 });
 
-export const metadata: Metadata = {
-  title: "HARON OS | AI Digital Operating System",
-  description:
-    "A futuristic AI-powered digital operating system for engineering, analytics, learning, writing, and intelligent creation.",
-  icons: {
-    icon: "/favicon.ico",
-  },
-};
+/**
+ * PRODUCTION SEO: Comprehensive metadata
+ */
+export const metadata: Metadata = createMetadata();
 
 export default function RootLayout({
   children,
@@ -58,8 +55,32 @@ export default function RootLayout({
       dir="ltr"
       className={`${inter.variable} ${mono.variable} ${cairo.variable} ${ibmArabic.variable} ${tajawal.variable} h-full antialiased`}
     >
+      <head>
+        {/* PRODUCTION: JSON-LD Structured Data */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(createJsonLd("Organization")),
+          }}
+        />
+      </head>
       <body className="min-h-full overflow-x-hidden bg-[#02030a] text-white">
         {children}
+        {/* PRODUCTION: Vercel Analytics */}
+        {process.env.NODE_ENV === "production" && (
+          <>
+            {/* Vercel Web Analytics */}
+            <script
+              defer
+              src="https://cdn.vercel-insights.com/v1/script.js"
+            />
+            {/* Vercel Speed Insights */}
+            <script
+              defer
+              src="https://cdn.vercel-insights.com/v1/speed-insights.js"
+            />
+          </>
+        )}
       </body>
     </html>
   );
