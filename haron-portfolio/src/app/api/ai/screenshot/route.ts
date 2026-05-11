@@ -14,7 +14,7 @@ export const runtime = "nodejs";
 
 /**
  * SECURITY: Screenshot analysis endpoint
- * 
+ *
  * Implements:
  * - File size validation (max 6 MB)
  * - MIME type validation (images only)
@@ -24,19 +24,36 @@ export const runtime = "nodejs";
  */
 export async function POST(request: NextRequest) {
   const startTime = performance.now();
+
   try {
     // SECURITY: Rate limiting
-    const ip = getSafeIP(request.ip, request.headers.get("x-forwarded-for"));
-    const usage = checkUsageLimit(`screenshot:${ip}`, 20); // 20 requests per hour
+    const ip = getSafeIP(
+      request.ip,
+      request.headers.get("x-forwarded-for"),
+    );
 
+    const usage = checkUsageLimit(
+      `screenshot:${ip}`,
+      20,
+    );
+
+    // 20 requests per hour
     if (!usage.allowed) {
-      trackError("rate_limit_exceeded", "Screenshot endpoint rate limit hit");
+      trackError(
+        "rate_limit_exceeded",
+        "Screenshot endpoint rate limit hit",
+      );
+
       return NextResponse.json(
-        { error: "Rate limit reached. Please try again later." },
+        {
+          error: "Rate limit reached. Please try again later.",
+        },
         {
           status: 429,
           headers: {
-            "Retry-After": String(usage.retryAfter ?? 3600),
+            "Retry-After": String(
+              usage.retryAfter ?? 3600,
+            ),
           },
         },
       );
@@ -44,13 +61,22 @@ export async function POST(request: NextRequest) {
 
     // SECURITY: Parse form data
     let formData: FormData;
+
     try {
       formData = await request.formData();
     } catch {
-      trackError("invalid_form_data", "Failed to parse screenshot form data");
+      trackError(
+        "invalid_form_data",
+        "Failed to parse screenshot form data",
+      );
+
       return NextResponse.json(
-        { error: "Invalid form data" },
-        { status: 400 },
+        {
+          error: "Invalid form data",
+        },
+        {
+          status: 400,
+        },
       );
     }
 
@@ -58,15 +84,25 @@ export async function POST(request: NextRequest) {
     const promptField = formData.get("prompt");
 
     // SECURITY: Validate file
-    const fileValidation = validateFileUpload(file, 6 * 1024 * 1024, [
-      "image/*",
-    ]);
+    const fileValidation = validateFileUpload(
+      file,
+      6 * 1024 * 1024,
+      ["image/*"],
+    );
 
     if (!fileValidation.valid) {
-      trackError("validation_error", `Screenshot file validation failed: ${fileValidation.error}`);
+      trackError(
+        "validation_error",
+        `Screenshot file validation failed: ${fileValidation.error}`,
+      );
+
       return NextResponse.json(
-        { error: fileValidation.error },
-        { status: 400 },
+        {
+          error: fileValidation.error,
+        },
+        {
+          status: 400,
+        },
       );
     }
 
@@ -77,22 +113,34 @@ export async function POST(request: NextRequest) {
       1000,
       "prompt",
     );
+
     const prompt = promptValidation.value;
 
     // SECURITY: Analyze image
     const aiStartTime = performance.now();
-    const arrayBuffer = await fileValidation.file!.arrayBuffer();
-    const base64 = Buffer.from(arrayBuffer).toString("base64");
+
+    const arrayBuffer =
+      await fileValidation.file!.arrayBuffer();
+
+    const base64 =
+      Buffer.from(arrayBuffer).toString("base64");
+
     const result = await analyzeImage(
       base64,
       fileValidation.file!.type || "image/png",
       prompt,
       detectInputLanguage(prompt),
     );
+
     const aiEndTime = performance.now();
-    
-    trackPerformance("screenshot", aiEndTime - aiStartTime);
-    const responseTime = performance.now() - startTime;
+
+    trackPerformance(
+      "screenshot",
+      aiEndTime - aiStartTime,
+    );
+
+    const responseTime =
+      performance.now() - startTime;
 
     return NextResponse.json(
       {
@@ -101,26 +149,44 @@ export async function POST(request: NextRequest) {
       },
       {
         headers: {
-          "X-Response-Time": `${responseTime.toFixed(2)}ms`,
+          "X-Response-Time":
+            `${responseTime.toFixed(2)}ms`,
         },
       },
     );
   } catch (error) {
-    trackError("screenshot_endpoint_error", `Screenshot endpoint error: ${error instanceof Error ? error.message : "Unknown error"}`);
-    // SECURITY: Safe error response
-    const isDev = process.env.NODE_ENV === "development";
-    const message = getSafeErrorMessage(error, isDev);
+    trackError(
+      "screenshot_endpoint_error",
+      `Screenshot endpoint error: ${
+        error instanceof Error
+          ? error.message
+          : "Unknown error"
+      }`,
+    );
 
-    const responseTime = performance.now() - startTime;
+    // SECURITY: Safe error response
+    const isDev =
+      process.env.NODE_ENV === "development";
+
+    const message = getSafeErrorMessage(
+      error,
+      isDev,
+    );
+
+    const responseTime =
+      performance.now() - startTime;
+
     return NextResponse.json(
-      { error: message },
+      {
+        error: message,
+      },
       {
         status: 500,
         headers: {
-          "X-Response-Time": `${responseTime.toFixed(2)}ms`,
+          "X-Response-Time":
+            `${responseTime.toFixed(2)}ms`,
         },
       },
     );
   }
-}
 }
