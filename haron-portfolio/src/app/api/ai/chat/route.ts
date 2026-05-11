@@ -1,4 +1,4 @@
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 import {
   detectInputLanguage,
@@ -7,62 +7,129 @@ import {
   type ChatMessage,
 } from "@/services/gemini";
 import { checkUsageLimit } from "@/services/usage-limits";
+import {
+  validateChatRequest,
+  getSafeIP,
+  getSafeErrorMessage,
+} from "@/lib/security";
 
 export const runtime = "nodejs";
 
+/**
+ * SECURITY: Chat endpoint
+ * 
+ * Implements:
+ * - Frontend role enforcement (user role only)
+ * - Request validation
+ * - Rate limiting
+ * - Safe error handling
+ * - Secure headers
+ */
 export async function POST(request: NextRequest) {
   try {
-    const ip = request.ip ?? request.headers.get("x-forwarded-for") ?? "local";
-    const usage = checkUsageLimit(`chat:${ip}`, 40);
+    // SECURITY: Get safe IP for rate limiting
+  const forwardedFor = request.headers.get("x-forwarded-for");
+
+const ip = getSafeIP(
+  typeof request.ip === "string" ? request.ip : null,
+  forwardedFor
+);
+    const rateLimitKey = `chat:${ip}`;
+    const usage = checkUsageLimit(rateLimitKey, 40); // 40 requests per hour
 
     if (!usage.allowed) {
-      return Response.json({ error: "Usage limit reached. Try again later." }, { status: 429 });
+      return new Response(
+        JSON.stringify({
+          error: "Rate limit reached. Please try again later.",
+        }),
+        {
+          status: 429,
+          headers: {
+            "Content-Type": "application/json",
+            "Retry-After": String(usage.retryAfter ?? 3600),
+          },
+        },
+      );
     }
 
-    const body = (await request.json()) as {
-      language?: AssistantLanguage;
-      context?: {
-        locale?: string;
-        timezone?: string;
-        localTime?: string;
-        device?: string;
-      };
-      messages?: ChatMessage[];
-    };
+    // SECURITY: Parse and validate body
+    let body: unknown;
+    try {
+      body = await request.json();
+    } catch {
+      return new Response(
+        JSON.stringify({ error: "Invalid JSON in request body" }),
+        {
+          status: 400,
+          headers: { "Content-Type": "application/json" },
+        },
+      );
+    }
 
-    const userText = body.messages?.filter((message) => message.role === "user").at(-1)?.content ?? "";
-    const language = body.language ?? detectInputLanguage(userText);
-    const messages: ChatMessage[] = [
+    // SECURITY: Validate request structure
+    const validation = validateChatRequest(body);
+    if (!validation.valid) {
+      return new Response(
+        JSON.stringify({ error: validation.error ?? "Invalid request" }),
+        {
+          status: 400,
+          headers: { "Content-Type": "application/json" },
+        },
+      );
+    }
+
+    const { language, messages, context } = validation;
+
+    // SECURITY: Inject server-side system prompt only
+    // Never trust frontend for system instructions
+    const systemPrompt = [
+      "You are the live HARON OS assistant.",
+      "Keep responses concise, practical, warm, and product-grade.",
+      "Avoid fake sci-fi theatrics and verbose filler.",
+      "Prefer useful steps, clear formatting, and direct answers.",
+      context
+        ? `Runtime context: locale=${context.locale ?? "unknown"}, timezone=${context.timezone ?? "unknown"}, localTime=${context.localTime ?? "unknown"}, device=${context.device ?? "unknown"}.`
+        : "Runtime context: unknown",
+    ].join(" ");
+
+    const safeMessages: ChatMessage[] = [
       {
         role: "system",
-        content:
-          [
-            "You are the live HARON OS assistant.",
-            "Keep responses concise, practical, warm, and product-grade.",
-            "Avoid fake sci-fi theatrics and verbose filler.",
-            "Prefer useful steps, clear formatting, and direct answers.",
-            `Runtime context: locale=${body.context?.locale ?? "unknown"}, timezone=${body.context?.timezone ?? "unknown"}, localTime=${body.context?.localTime ?? "unknown"}, device=${body.context?.device ?? "unknown"}.`,
-          ].join(" "),
+        content: systemPrompt,
       },
-      ...(body.messages ?? []),
+      ...messages,
     ];
 
-    const stream = await streamChatCompletion(messages, language);
+    // SECURITY: Generate stream with validated data
+    const stream = await streamChatCompletion(safeMessages, language);
 
+    // SECURITY: Return response with security headers
     return new Response(stream, {
+      status: 200,
       headers: {
         "Content-Type": "text/plain; charset=utf-8",
-        "Cache-Control": "no-cache, no-transform",
+        "Cache-Control": "no-cache, no-store, must-revalidate",
+        "X-Content-Type-Options": "nosniff",
+        "X-Frame-Options": "DENY",
         "X-Usage-Remaining": String(usage.remaining),
       },
     });
   } catch (error) {
-    const message =
-      error instanceof Error ? error.message : "HARON OS AI route failed.";
+    // SECURITY: Don't expose internal errors
+    const isDev = process.env.NODE_ENV === "development";
+    const message = getSafeErrorMessage(error, isDev);
 
-    return new Response(message, {
-      status: 200,
-      headers: { "Content-Type": "text/plain; charset=utf-8" },
-    });
+    return new Response(
+      JSON.stringify({
+        error: message,
+      }),
+      {
+        status: 500,
+        headers: {
+          "Content-Type": "application/json",
+          "X-Content-Type-Options": "nosniff",
+        },
+      },
+    );
   }
 }

@@ -50,12 +50,19 @@ function createTextStream(text: string, chunkSize = 14) {
   });
 }
 
+/**
+ * SECURITY: Clean messages and enforce safe role mapping
+ * 
+ * Frontend messages MUST be "user" role only.
+ * This prevents system prompt injection and role escalation.
+ */
 function cleanMessages(messages: ChatMessage[]) {
   return messages
     .filter((message) => message.content?.trim())
     .slice(-16)
     .map((message) => ({
-      role: message.role,
+
+      role: ("user" as const),
       content: message.content.trim(),
     }));
 }
@@ -90,22 +97,21 @@ export function buildAssistantSystemPrompt(language: AssistantLanguage) {
 }
 
 function messagesToPrompt(messages: ChatMessage[], language: AssistantLanguage) {
-  const systemFromMessages = messages
-    .filter((message) => message.role === "system")
-    .map((message) => message.content)
-    .join("\n");
-
+  /**
+   * SECURITY: Build prompt safely
+   * - System prompts only from server (never from frontend messages)
+   * - All frontend messages are forced to "user" role
+   * - No system prompt extraction from user content
+   */
   const dialogue = cleanMessages(messages)
-    .filter((message) => message.role !== "system")
     .map((message) => {
-      const role = message.role === "assistant" || message.role === "model" ? "Assistant" : "User";
+      const role = message.role === "user" ? "User" : "Assistant";
       return `${role}: ${message.content}`;
     })
     .join("\n\n");
 
   return [
     buildAssistantSystemPrompt(language),
-    systemFromMessages,
     "Conversation:",
     dialogue || "User: Open HARON OS.",
     "",
