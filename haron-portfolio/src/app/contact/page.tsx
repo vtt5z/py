@@ -10,9 +10,12 @@ export default function ContactPage() {
   return (
     <PageFrame>
       <PageHero
-        eyebrow="Contact Signal"
-        title="Open a professional channel with Haron."
-        text="Reach out for software engineering, full-stack systems, data analytics, AI interfaces, dashboards, and future-focused digital products."
+        eyebrow={{ en: "Contact Signal", ar: "قناة التواصل" }}
+        title={{ en: "Open a professional channel with Haron.", ar: "افتح قناة تواصل احترافية مع هارون." }}
+        text={{
+          en: "Reach out for software engineering, full-stack systems, data analytics, AI interfaces, dashboards, and future-focused digital products.",
+          ar: "تواصل لأعمال هندسة البرمجيات والأنظمة المتكاملة وتحليل البيانات وواجهات الذكاء واللوحات والمنتجات الرقمية المستقبلية.",
+        }}
         icon={Mail}
       >
         <div className="space-y-3">

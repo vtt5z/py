@@ -163,6 +163,7 @@ export const commandPaletteItems = [
   { label: "About Haron", target: "/about", icon: UserRound },
   { label: "Projects", target: "/projects", icon: Rocket },
   { label: "Contact", target: "/contact", icon: Mail },
+  { label: "SQL Generator", target: "/tools/sql", icon: DatabaseZap },
   { label: "Summarize PDF Action", target: "/tools#pdf", icon: FileSearch },
   { label: "Analyze Screenshot Action", target: "/tools#screenshot", icon: ImageUp },
 ];
@@ -170,7 +171,7 @@ export const commandPaletteItems = [
 export const systemSignals = [
   { label: "Secure API routes", icon: ShieldCheck },
   { label: "Gemini responses", icon: Zap },
-  { label: "Supabase ready", icon: DatabaseZap },
+  { label: "Firebase ready", icon: DatabaseZap },
   { label: "Vercel ready", icon: Rocket },
   { label: "Usage limits", icon: Gauge },
   { label: "AI memory hooks", icon: Cpu },
@@ -186,7 +187,7 @@ export const platformPages = [
   { title: "Developer", href: "/developer", icon: Code2, text: "JSON, SQL, regex, APIs, code explanation, and debugging." },
   { title: "Dashboard", href: "/dashboard", icon: Gauge, text: "AI statistics, activity, usage signals, and system monitoring widgets." },
   { title: "Terminal", href: "/terminal", icon: TerminalSquare, text: "Command-style shortcuts for frequent AI tasks." },
-  { title: "Settings", href: "/settings", icon: Settings, text: "Environment, Supabase, Gemini, storage, and deployment readiness." },
+  { title: "Settings", href: "/settings", icon: Settings, text: "Environment, Firebase, Gemini, storage, and deployment readiness." },
   { title: "About", href: "/about", icon: UserRound, text: "Haron Mohammed, software engineering, analytics, and platform vision." },
   { title: "Projects", href: "/projects", icon: Rocket, text: "AI platform, analytics, healthcare, e-commerce, and visual systems." },
   { title: "Contact", href: "/contact", icon: Mail, text: "Professional contact signal and social links." },
@@ -205,7 +206,7 @@ export const projectSystems = [
   {
     title: "HARON OS AI Platform",
     text: "A cinematic digital operating system with AI tools, dashboard, terminal, and command palette.",
-    stack: ["Next.js", "Gemini", "Supabase", "Framer Motion"],
+    stack: ["Next.js", "Gemini", "Firebase", "Framer Motion"],
   },
   {
     title: "Healthcare Intelligence System",

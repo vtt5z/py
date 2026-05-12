@@ -5,12 +5,27 @@ import { ArrowRight, Bot, Command, TerminalSquare } from "lucide-react";
 
 import { useLanguage } from "@/components/providers/language-provider";
 import { useRotatingText } from "@/hooks/use-rotating-text";
-import { osMetrics, rotatingCommands } from "@/lib/haron-os-content";
 import { cn } from "@/lib/utils";
 
 export function OSHero() {
   const { lang, dir } = useLanguage();
-  const suggestion = useRotatingText(rotatingCommands, 1500);
+  const commands = lang === "ar"
+    ? ["لخّص ملف PDF", "حل خطأ Flutter", "أعد صياغة رسالة", "حلّل لقطة شاشة", "أنشئ ملاحظات مذاكرة"]
+    : ["Summarize a PDF", "Fix a Flutter error", "Rewrite a message", "Analyze a screenshot", "Create study notes"];
+  const metrics = lang === "ar"
+    ? [
+        { label: "أدوات ذكية", value: "18" },
+        { label: "استجابات", value: "مباشر" },
+        { label: "مساحة العمل", value: "24/7" },
+        { label: "اللغات", value: "عربي/EN" },
+      ]
+    : [
+        { label: "AI tools", value: "18" },
+        { label: "Responses", value: "Live" },
+        { label: "Workspace", value: "24/7" },
+        { label: "Languages", value: "EN/AR" },
+      ];
+  const suggestion = useRotatingText(commands, 1500);
   const brand = lang === "ar" ? "هارون" : "HARON";
   const os = lang === "ar" ? "أو إس" : "OS";
 
@@ -24,7 +39,7 @@ export function OSHero() {
         >
           <div className="mb-8 inline-flex items-center gap-3 rounded-full border border-cyan-200/20 bg-white/[0.04] px-4 py-2 text-sm font-semibold text-cyan-100/80 backdrop-blur-xl">
             <span className="size-2 rounded-full bg-emerald-300 shadow-[0_0_18px_rgba(110,231,183,0.9)]" />
-            {lang === "ar" ? "مساحة العمل جاهزة • Gemini متصل • Supabase جاهز" : "AI Workspace online • Gemini routes ready • Supabase connected layer"}
+            {lang === "ar" ? "مساحة العمل جاهزة • Gemini متصل • Firebase جاهز" : "AI Workspace online • Gemini routes ready • Firebase connected"}
           </div>
           <h1 className="max-w-5xl text-6xl font-black leading-[0.86] tracking-tight text-white sm:text-8xl lg:text-9xl">
             {brand}
@@ -109,7 +124,7 @@ export function OSHero() {
               </div>
             </div>
             <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
-              {osMetrics.map((metric) => (
+              {metrics.map((metric) => (
                 <div key={metric.label} className="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
                   <p className="text-2xl font-black text-white">{metric.value}</p>
                   <p className="mt-1 text-xs font-bold uppercase tracking-[0.18em] text-cyan-100/60">

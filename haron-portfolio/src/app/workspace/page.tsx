@@ -11,9 +11,12 @@ export default function WorkspacePage() {
   return (
     <PageFrame>
       <PageHero
-        eyebrow="Workspace Matrix"
-        title="The central command room for HARON OS."
-        text="A premium operating surface where AI, tools, student workflows, developer utilities, and system activity converge."
+        eyebrow={{ en: "Workspace Matrix", ar: "مصفوفة مساحة العمل" }}
+        title={{ en: "The central command room for HARON OS.", ar: "غرفة القيادة المركزية لهارون أو إس." }}
+        text={{
+          en: "A premium operating surface where AI, tools, student workflows, developer utilities, and system activity converge.",
+          ar: "واجهة تشغيل فاخرة تجمع المساعد والأدوات ومسارات الطالب وأدوات المطور ونشاط النظام.",
+        }}
         icon={LayoutDashboard}
       >
         <div className="h-72 rounded-3xl border border-cyan-200/15 bg-black/30 p-4">

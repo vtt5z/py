@@ -3,13 +3,25 @@
 import { motion } from "framer-motion";
 import { ExternalLink } from "lucide-react";
 
+import { useLanguage } from "@/components/providers/language-provider";
 import { projectSystems } from "@/lib/haron-os-content";
 
 export function ProjectsGridSection() {
+  const { lang, dir } = useLanguage();
+  const arProjects = [
+    { title: "منصة هارون أو إس للذكاء", text: "نظام تشغيل رقمي سينمائي مع أدوات ذكاء ولوحة تحكم وطرفية ولوحة أوامر.", stack: ["Next.js", "Gemini", "Firebase", "Framer Motion"] },
+    { title: "نظام ذكاء صحي", text: "تدفقات رعاية فورية ومؤشرات مرضى ولوحات تشغيل آمنة.", stack: ["Flutter", "Firebase", "Python", "Analytics"] },
+    { title: "مركز تحليلات Power BI", text: "واجهة ذكاء أعمال للبيانات الخام والمؤشرات والرسوم والملخصات التنفيذية.", stack: ["Power BI", "SQL", "Python", "DAX"] },
+    { title: "تجربة بيانات فوركس", text: "رفيق تداول بمؤشرات سوق ولوحات مخاطر وتصورات مالية.", stack: ["Flutter", "REST APIs", "Charts", "Firebase"] },
+    { title: "منصة عمليات تجارة إلكترونية", text: "متجر فاخر وتدفقات إدارة ومنتجات وتجربة موجهة للتحويل.", stack: ["Next.js", "APIs", "UI/UX", "SQL"] },
+    { title: "مختبر تصورات الذكاء", text: "أنظمة مرئية تفاعلية للتحليلات التنبؤية وشرح الذكاء وقصص البيانات.", stack: ["Three.js", "ML", "Data Viz", "TypeScript"] },
+  ];
+  const projects = lang === "ar" ? arProjects : projectSystems;
+
   return (
-    <section className="relative z-10 mx-auto max-w-7xl px-5 py-12 sm:px-8 lg:px-10">
+    <section className={`relative z-10 mx-auto max-w-7xl px-5 py-12 sm:px-8 lg:px-10 ${dir === "rtl" ? "font-arabic text-right" : ""}`}>
       <div className="grid gap-5 lg:grid-cols-2">
-        {projectSystems.map((project, index) => (
+        {projects.map((project, index) => (
           <motion.article
             key={project.title}
             initial={{ opacity: 0, y: 26 }}

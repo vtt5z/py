@@ -109,6 +109,7 @@ function getLabel(label: string, lang: "en" | "ar") {
     "About Haron": "عن هارون",
     Projects: "المشاريع",
     Contact: "التواصل",
+    "SQL Generator": "مولد SQL",
     "Summarize PDF Action": "تلخيص PDF",
     "Analyze Screenshot Action": "تحليل صورة",
   };

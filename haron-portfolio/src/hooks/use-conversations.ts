@@ -42,7 +42,7 @@ interface UseConversationsReturn {
   loadConversations: () => Promise<void>;
   startNewConversation: (firstMessage: string) => Promise<string>;
   switchConversation: (conversationId: string) => Promise<void>;
-  addMessage: (role: "user" | "assistant", content: string) => Promise<void>;
+  addMessage: (role: "user" | "assistant", content: string, conversationId?: string) => Promise<void>;
   archiveCurrentConversation: () => Promise<void>;
   deleteCurrentConversation: () => Promise<void>;
 }
@@ -177,8 +177,9 @@ export function useConversations(): UseConversationsReturn {
 
   // Add message
   const addMessage = useCallback(
-    async (role: "user" | "assistant", content: string) => {
-      if (!currentConversation) return;
+    async (role: "user" | "assistant", content: string, conversationId?: string) => {
+      const activeConversationId = conversationId || currentConversation?.id;
+      if (!activeConversationId) return;
 
       // Guest mode
       if (isGuest || !isAuthenticated) {
@@ -186,7 +187,7 @@ export function useConversations(): UseConversationsReturn {
           localStorage.getItem(GUEST_STORAGE_KEY) || "[]"
         );
 
-        const convIdx = guestConvs.findIndex((c) => c.id === currentConversation.id);
+        const convIdx = guestConvs.findIndex((c) => c.id === activeConversationId);
         if (convIdx >= 0) {
           guestConvs[convIdx].messages.push({
             id: `msg_${Date.now()}`,
@@ -209,14 +210,14 @@ export function useConversations(): UseConversationsReturn {
 
       try {
         const message = await addMessageToConversation(
-          currentConversation.id,
+          activeConversationId,
           role,
           content,
           "en"
         );
 
         setCurrentConversation((prev) => {
-          if (!prev) return null;
+          if (!prev || prev.id !== activeConversationId) return prev;
           return {
             ...prev,
             messages: [...prev.messages, message],

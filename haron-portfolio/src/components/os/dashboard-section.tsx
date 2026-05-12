@@ -15,22 +15,23 @@ import {
   YAxis,
 } from "recharts";
 
+import { useLanguage } from "@/components/providers/language-provider";
 import { dashboardSeries } from "@/lib/haron-os-content";
-
-const stats = [
-  { label: "AI requests", value: "1.8k", icon: Zap, tone: "text-cyan-100" },
-  { label: "Tool runs", value: "742", icon: Cpu, tone: "text-violet-100" },
-  { label: "Storage ready", value: "99%", icon: HardDrive, tone: "text-emerald-100" },
-  { label: "System health", value: "Live", icon: Activity, tone: "text-fuchsia-100" },
-];
 
 export function DashboardSection() {
   const [mounted, setMounted] = useState(false);
+  const { lang, dir } = useLanguage();
+  const stats = [
+    { label: lang === "ar" ? "طلبات الذكاء" : "AI requests", value: "1.8k", icon: Zap, tone: "text-cyan-100" },
+    { label: lang === "ar" ? "تشغيل الأدوات" : "Tool runs", value: "742", icon: Cpu, tone: "text-violet-100" },
+    { label: lang === "ar" ? "التخزين جاهز" : "Storage ready", value: "99%", icon: HardDrive, tone: "text-emerald-100" },
+    { label: lang === "ar" ? "صحة النظام" : "System health", value: lang === "ar" ? "مباشر" : "Live", icon: Activity, tone: "text-fuchsia-100" },
+  ];
 
   useEffect(() => setMounted(true), []);
 
   return (
-    <section className="relative z-10 mx-auto max-w-7xl px-5 py-12 sm:px-8 lg:px-10">
+    <section className={`relative z-10 mx-auto max-w-7xl px-5 py-12 sm:px-8 lg:px-10 ${dir === "rtl" ? "font-arabic text-right" : ""}`}>
       <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
         {stats.map((stat, index) => (
           <motion.div
@@ -51,7 +52,7 @@ export function DashboardSection() {
         <div className="h-[28rem] rounded-[2rem] border border-white/10 bg-white/[0.045] p-5 backdrop-blur-2xl">
           <div className="mb-4 flex items-center justify-between">
             <p className="font-mono text-xs uppercase tracking-[0.3em] text-cyan-100/60">
-              AI Activity Graph
+              {lang === "ar" ? "رسم نشاط الذكاء" : "AI Activity Graph"}
             </p>
             <Gauge className="size-5 text-cyan-100" />
           </div>
@@ -76,7 +77,7 @@ export function DashboardSection() {
         <div className="h-[28rem] rounded-[2rem] border border-white/10 bg-white/[0.045] p-5 backdrop-blur-2xl">
           <div className="mb-4 flex items-center justify-between">
             <p className="font-mono text-xs uppercase tracking-[0.3em] text-violet-100/60">
-              Module Usage
+              {lang === "ar" ? "استخدام الوحدات" : "Module Usage"}
             </p>
             <Radio className="size-5 text-violet-100" />
           </div>
@@ -95,7 +96,9 @@ export function DashboardSection() {
         </div>
       </div>
       <div className="mt-6 grid gap-4 lg:grid-cols-3">
-        {["PDF summarized into 8 quiz cards", "Screenshot analysis detected contrast issue", "SQL generator optimized analytics query"].map((item) => (
+        {(lang === "ar"
+          ? ["تم تلخيص PDF إلى 8 بطاقات اختبار", "تحليل الصورة اكتشف مشكلة تباين", "مولد SQL حسّن استعلام التحليلات"]
+          : ["PDF summarized into 8 quiz cards", "Screenshot analysis detected contrast issue", "SQL generator optimized analytics query"]).map((item) => (
           <div key={item} className="rounded-2xl border border-white/10 bg-black/28 p-4 text-sm font-semibold text-white/62 backdrop-blur-xl">
             <span className="mr-3 inline-block size-2 rounded-full bg-cyan-300 shadow-[0_0_12px_rgba(34,211,238,0.8)]" />
             {item}

@@ -4,14 +4,21 @@ import React, { createContext, useContext, useEffect, useState, useCallback } fr
 import type { AuthContextType, AuthUser, UserProfile } from "@/types/auth";
 import {
   signInWithGoogleProvider,
+  completeGoogleRedirectSignIn,
   signUpWithEmailPassword,
   signInWithEmailPassword,
   signOutProvider,
   resetPasswordEmail,
+  confirmPasswordResetWithCode,
+  verifyEmailWithCode,
   sendVerificationEmailToUser,
   signInAnonymouslyProvider,
   onAuthStateChange,
   getUserProfile,
+  refreshCurrentUser,
+  subscribeToUserProfile,
+  updateCurrentUserProfile,
+  uploadCurrentUserAvatar,
   getAuthErrorMessage,
 } from "@/services/auth";
 
@@ -22,7 +29,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Monitor auth state
   useEffect(() => {
     const unsubscribe = onAuthStateChange(async (authUser) => {
       try {
@@ -45,6 +51,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return unsubscribe;
   }, []);
 
+  useEffect(() => {
+    completeGoogleRedirectSignIn().catch((error) => {
+      console.error("Failed to complete Google redirect sign-in", error);
+    });
+  }, []);
+
+  useEffect(() => {
+    if (!user?.uid || user.isAnonymous) return undefined;
+
+    return subscribeToUserProfile(user.uid, (nextProfile) => {
+      setProfile(nextProfile);
+    });
+  }, [user?.uid, user?.isAnonymous]);
+
   const signInWithGoogle = useCallback(async () => {
     try {
       setLoading(true);
@@ -57,10 +77,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  const signInWithEmail = useCallback(async (email: string, password: string) => {
+  const signInWithEmail = useCallback(async (email: string, password: string, rememberMe = true) => {
     try {
       setLoading(true);
-      await signInWithEmailPassword(email, password);
+      await signInWithEmailPassword(email, password, rememberMe);
     } catch (error) {
       const message = getAuthErrorMessage(error);
       throw new Error(message);
@@ -124,6 +144,58 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
+  const confirmPasswordReset = useCallback(async (code: string, password: string) => {
+    try {
+      await confirmPasswordResetWithCode(code, password);
+    } catch (error) {
+      const message = getAuthErrorMessage(error);
+      throw new Error(message);
+    }
+  }, []);
+
+  const verifyEmailAction = useCallback(async (code: string) => {
+    try {
+      await verifyEmailWithCode(code);
+    } catch (error) {
+      const message = getAuthErrorMessage(error);
+      throw new Error(message);
+    }
+  }, []);
+
+  const refreshUser = useCallback(async () => {
+    try {
+      const refreshed = await refreshCurrentUser();
+      setUser(refreshed);
+      if (refreshed?.uid) {
+        setProfile(await getUserProfile(refreshed.uid));
+      }
+    } catch (error) {
+      const message = getAuthErrorMessage(error);
+      throw new Error(message);
+    }
+  }, []);
+
+  const updateProfile = useCallback(async (data: Partial<UserProfile>) => {
+    try {
+      if (profile) setProfile({ ...profile, ...data, updatedAt: new Date() });
+      await updateCurrentUserProfile(data);
+    } catch (error) {
+      const message = getAuthErrorMessage(error);
+      throw new Error(message);
+    }
+  }, [profile]);
+
+  const uploadAvatar = useCallback(async (file: File) => {
+    try {
+      const avatar = await uploadCurrentUserAvatar(file);
+      if (profile) setProfile({ ...profile, avatar, photoURL: avatar, updatedAt: new Date() });
+      return avatar;
+    } catch (error) {
+      const message = getAuthErrorMessage(error);
+      throw new Error(message);
+    }
+  }, [profile]);
+
   const value: AuthContextType = {
     user,
     profile,
@@ -137,6 +209,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     continueAsGuest,
     sendVerificationEmail,
     resetPassword,
+    confirmPasswordReset,
+    verifyEmailAction,
+    refreshUser,
+    updateProfile,
+    uploadAvatar,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

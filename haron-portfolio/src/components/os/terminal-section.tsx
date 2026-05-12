@@ -2,11 +2,29 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import { TerminalSquare } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
-import { terminalCommands } from "@/lib/haron-os-content";
+import { useLanguage } from "@/components/providers/language-provider";
 
 export function TerminalSection() {
+  const { lang, dir } = useLanguage();
+  const terminalCommands = useMemo(
+    () =>
+      lang === "ar"
+        ? [
+            { command: "لخّص pdf", output: "ينشئ ملخصًا قصيرًا ونقاطًا مهمة وشرحًا مبسطًا وأسئلة تدريبية." },
+            { command: "حل خطأ firebase auth", output: "يشرح الأسباب المحتملة والإصلاحات العملية وطريقة التحقق." },
+            { command: "أعد صياغة رسالة احترافية", output: "يحوّل النص الخام إلى رسالة واضحة ومصقولة بالنبرة المناسبة." },
+            { command: "اشرح sql joins", output: "يشرح أنواع الربط بأمثلة سهلة ومتى تستخدم كل نوع." },
+          ]
+        : [
+            { command: "summarize pdf", output: "Creates a short summary, key points, simple explanation, and quiz questions." },
+            { command: "fix firebase auth error", output: "Explains likely causes, practical fixes, and how to verify the solution." },
+            { command: "rewrite professional message", output: "Turns rough text into a clear, polished message with the right tone." },
+            { command: "explain sql joins", output: "Explains joins with simple examples and when to use each one." },
+          ],
+    [lang],
+  );
   const [index, setIndex] = useState(0);
 
   useEffect(() => {
@@ -15,18 +33,18 @@ export function TerminalSection() {
     }, 2600);
 
     return () => window.clearInterval(timer);
-  }, []);
+  }, [terminalCommands.length]);
 
   const active = terminalCommands[index];
 
   return (
-    <section id="terminal" className="relative z-10 mx-auto min-h-screen max-w-7xl px-5 py-28 sm:px-8 lg:px-10">
+    <section id="terminal" className={`relative z-10 mx-auto min-h-screen max-w-7xl px-5 py-28 sm:px-8 lg:px-10 ${dir === "rtl" ? "font-arabic text-right" : ""}`}>
       <div className="mb-12 max-w-4xl">
         <p className="mb-4 font-mono text-xs uppercase tracking-[0.38em] text-cyan-200/70">
-          AI Terminal Mode
+          {lang === "ar" ? "وضع الطرفية الذكية" : "AI Terminal Mode"}
         </p>
         <h2 className="text-4xl font-black tracking-tight text-white sm:text-6xl">
-          A cinematic command layer for fast AI actions.
+          {lang === "ar" ? "طبقة أوامر سينمائية لإجراءات الذكاء السريعة." : "A cinematic command layer for fast AI actions."}
         </h2>
       </div>
       <div className="overflow-hidden rounded-[2rem] border border-cyan-200/20 bg-black/50 shadow-[0_0_90px_rgba(34,211,238,0.12)] backdrop-blur-2xl">
@@ -54,7 +72,7 @@ export function TerminalSection() {
               </p>
               <div className="mt-8 rounded-2xl border border-white/10 bg-white/[0.04] p-5">
                 <p className="mb-3 text-xs uppercase tracking-[0.28em] text-white/35">
-                  Output
+                  {lang === "ar" ? "النتيجة" : "Output"}
                 </p>
                 <p className="text-lg leading-8 text-white/72">{active.output}</p>
               </div>

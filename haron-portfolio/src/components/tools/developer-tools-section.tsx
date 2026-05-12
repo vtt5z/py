@@ -11,10 +11,10 @@ import { cn } from "@/lib/utils";
 
 type ToolMode = "json" | "regex" | "sql" | "api" | "code" | "debug";
 
-export function DeveloperToolsSection() {
+export function DeveloperToolsSection({ initialMode = "json" }: { initialMode?: ToolMode }) {
   const { lang, dir } = useLanguage();
-  const [mode, setMode] = useState<ToolMode>("json");
-  const [input, setInput] = useState('{"name":"HARON OS","type":"AI workspace"}');
+  const [mode, setMode] = useState<ToolMode>(initialMode);
+  const [input, setInput] = useState(() => defaultInput(initialMode, "en"));
   const [pattern, setPattern] = useState("\\w+");
   const [output, setOutput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -38,7 +38,7 @@ export function DeveloperToolsSection() {
       } else if (mode === "regex") {
         const regex = new RegExp(pattern, "g");
         const matches = [...input.matchAll(regex)].map((match) => match[0]);
-        setOutput(matches.length ? matches.join("\n") : "No matches found.");
+        setOutput(matches.length ? matches.join("\n") : lang === "ar" ? "لم يتم العثور على مطابقات." : "No matches found.");
       } else if (mode === "api") {
         if (!/^https?:\/\//i.test(input.trim())) {
           setOutput(lang === "ar" ? "أدخل رابط API يبدأ بـ http أو https." : "Enter an API URL starting with http or https.");
@@ -65,10 +65,10 @@ export function DeveloperToolsSection() {
           body: JSON.stringify(body),
         });
         const data = (await response.json()) as { result?: string; error?: string };
-        setOutput(data.result ?? data.error ?? "No output.");
+        setOutput(data.result ?? data.error ?? (lang === "ar" ? "لا توجد نتيجة." : "No output."));
       }
     } catch (error) {
-      setOutput(error instanceof Error ? error.message : "Tool failed.");
+      setOutput(error instanceof Error ? error.message : lang === "ar" ? "تعذر تشغيل الأداة." : "Tool failed.");
     } finally {
       setLoading(false);
     }
@@ -98,7 +98,10 @@ export function DeveloperToolsSection() {
         </p>
       </div>
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-6">
-        {developerTools.map((tool) => (
+        {developerTools.map((tool) => {
+          const localizedTitle = getToolLabel(tool.id as ToolMode, lang);
+          const localizedAction = getToolAction(tool.id as ToolMode, lang);
+          return (
           <button
             key={tool.id}
             type="button"
@@ -110,21 +113,21 @@ export function DeveloperToolsSection() {
             className="text-left rtl:text-right"
           >
             <OSCard
-              title={tool.title}
-              text={tool.action}
+              title={localizedTitle}
+              text={localizedAction}
               icon={tool.icon}
               className={mode === tool.id ? "border-cyan-200/60 bg-cyan-300/10" : ""}
             />
           </button>
-        ))}
+        )})}
       </div>
       <div className="mt-6 grid gap-5 lg:grid-cols-[0.9fr_1.1fr]">
         <div className="rounded-[2rem] border border-white/10 bg-white/[0.045] p-5 backdrop-blur-2xl">
           <div className="mb-4 flex items-center gap-3">
             <activeTool.icon className="size-6 text-cyan-100" />
             <div>
-              <p className="font-bold text-white">{activeTool.title}</p>
-              <p className="text-sm text-white/42">{activeTool.action}</p>
+              <p className="font-bold text-white">{getToolLabel(mode, lang)}</p>
+              <p className="text-sm text-white/42">{getToolAction(mode, lang)}</p>
               <p className="mt-2 text-xs leading-5 text-white/38">{hintFor(mode, lang)}</p>
             </div>
           </div>
@@ -133,7 +136,7 @@ export function DeveloperToolsSection() {
               value={pattern}
               onChange={(event) => setPattern(event.target.value)}
               className="mb-4 h-11 w-full rounded-2xl border border-white/10 bg-black/30 px-4 font-mono text-cyan-100 outline-none"
-              placeholder="Regex pattern"
+              placeholder={lang === "ar" ? "نمط Regex" : "Regex pattern"}
             />
           )}
           <textarea
@@ -174,6 +177,46 @@ export function DeveloperToolsSection() {
       </div>
     </section>
   );
+}
+
+function getToolLabel(mode: ToolMode, lang: "en" | "ar") {
+  const en: Record<ToolMode, string> = {
+    json: "JSON Formatter",
+    regex: "Regex Tester",
+    sql: "SQL Generator",
+    api: "API Tester",
+    code: "Code Explainer",
+    debug: "Error Debugger",
+  };
+  const ar: Record<ToolMode, string> = {
+    json: "منسق JSON",
+    regex: "اختبار Regex",
+    sql: "مولد SQL",
+    api: "اختبار API",
+    code: "شارح الكود",
+    debug: "محلل الأخطاء",
+  };
+  return (lang === "ar" ? ar : en)[mode];
+}
+
+function getToolAction(mode: ToolMode, lang: "en" | "ar") {
+  const en: Record<ToolMode, string> = {
+    json: "Format, minify, validate",
+    regex: "Match text instantly",
+    sql: "Generate query logic",
+    api: "Inspect endpoint responses",
+    code: "Explain complex snippets",
+    debug: "Diagnose stack traces",
+  };
+  const ar: Record<ToolMode, string> = {
+    json: "تنسيق وتصغير وتحقق",
+    regex: "مطابقة النص فورًا",
+    sql: "توليد منطق الاستعلامات",
+    api: "فحص استجابات الروابط",
+    code: "شرح المقاطع المعقدة",
+    debug: "تشخيص رسائل الأخطاء",
+  };
+  return (lang === "ar" ? ar : en)[mode];
 }
 
 function defaultInput(mode: ToolMode, lang: "en" | "ar") {

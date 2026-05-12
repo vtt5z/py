@@ -59,8 +59,9 @@ import {
   updateDoc,
   deleteDoc,
   Timestamp,
+  increment,
   writeBatch,
-  DocumentReference,
+  orderBy,
 } from "firebase/firestore";
 import { getFirebaseFirestore } from "@/lib/firebase";
 
@@ -115,6 +116,13 @@ export async function createConversation(
     createdAt: Timestamp.now(),
     updatedAt: Timestamp.now(),
     isArchived: false,
+  });
+
+  await addDoc(collection(db, "conversations", docRef.id, "messages"), {
+    role: "user",
+    content: firstMessage,
+    language: /[\u0600-\u06FF]/.test(firstMessage) ? "ar" : "en",
+    createdAt: Timestamp.now(),
   });
 
   return {
@@ -180,7 +188,7 @@ export async function addMessageToConversation(
   const convRef = doc(db, "conversations", conversationId);
   await updateDoc(convRef, {
     updatedAt: Timestamp.now(),
-    messages: { increment: 1 },
+    messages: increment(1),
   });
 
   return {
@@ -198,7 +206,7 @@ export async function addMessageToConversation(
 export async function getConversationMessages(conversationId: string): Promise<Message[]> {
   const db = getFirebaseFirestore();
   const messagesRef = collection(db, "conversations", conversationId, "messages");
-  const snapshot = await getDocs(messagesRef);
+  const snapshot = await getDocs(query(messagesRef, orderBy("createdAt", "asc")));
 
   return snapshot.docs.map((doc) => {
     const data = doc.data();

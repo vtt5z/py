@@ -2,25 +2,30 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import {
+  Archive,
   Bot,
   Check,
   Copy,
+  FileUp,
+  Folder,
   Loader2,
+  Mic,
+  PanelRight,
+  Pin,
+  Plus,
   RefreshCw,
-  RotateCcw,
+  Search,
   Send,
   Sparkles,
+  UserRound,
+  WandSparkles,
 } from "lucide-react";
-import {
-  KeyboardEvent,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { KeyboardEvent, useEffect, useMemo, useRef, useState } from "react";
 
 import { MarkdownMessage } from "@/components/os/markdown-message";
+import { useAuth } from "@/components/providers/auth-provider";
 import { useLanguage } from "@/components/providers/language-provider";
+import { useConversations } from "@/hooks/use-conversations";
 import { useRotatingText } from "@/hooks/use-rotating-text";
 import { cn } from "@/lib/utils";
 
@@ -31,62 +36,60 @@ type Message = {
 
 const ui = {
   en: {
-    brand: "HARON OS",
     assistant: "HARON OS Assistant",
-    eyebrow: "Gemini Intelligence",
-    title: "A premium AI workspace for fast, useful answers.",
-    subtitle: "Gemini 1.5 Flash • streaming • markdown • code",
-    intro:
-      "Welcome to HARON OS. Ask me to debug, summarize, write, translate, plan, or explain. I’ll keep it clean, practical, and polished.",
-    placeholder: [
-      "Ask HARON OS anything...",
-      "Start a new conversation",
-      "Paste code, errors, notes, or ideas...",
-    ],
-    clear: "New chat",
-    retry: "Regenerate",
-    thinking: "Thinking with Gemini",
-    copied: "Copied",
+    status: "Gemini core online",
+    workspace: "Assistant Workspace",
+    newChat: "New chat",
+    search: "Search chats...",
+    pinned: "Pinned",
+    recent: "Recent chats",
+    folders: "Folders",
+    noChats: "No saved chats yet",
+    tools: "Context tools",
+    memory: "Memory",
+    quick: "Quick actions",
+    upload: "Attach file",
+    voice: "Voice input",
+    send: "Send",
     copy: "Copy",
-    sendHint: "Enter to send • Shift+Enter for a new line",
+    copied: "Copied",
+    retry: "Regenerate",
+    thinking: "HARON is thinking",
+    emptyTitle: "What shall we build, fix, or understand?",
+    emptyText: "Use a prompt starter or type directly. This workspace keeps your conversation structured and ready to continue.",
+    hint: "Enter to send. Shift+Enter for a new line.",
     error: "The AI route returned an error.",
-    emptyTitle: "How can I help today?",
-    emptyText: "Choose a prompt or type your own. Fresh session, no stale history.",
-    suggestions: [
-      "Fix this Flutter Firebase auth error",
-      "Summarize a PDF into study notes",
-      "Rewrite this email professionally",
-      "Explain SQL joins with examples",
-    ],
+    foldersList: ["Engineering", "Study", "Writing"],
+    actions: ["Debug an error", "Summarize notes", "Write a launch plan", "Explain code"],
+    placeholders: ["Ask HARON OS anything...", "Paste code, notes, or a rough idea...", "Plan, debug, summarize, or write..."],
   },
   ar: {
-    brand: "هارون أو إس",
     assistant: "مساعد هارون أو إس",
-    eyebrow: "ذكاء Gemini",
-    title: "مساحة ذكاء مرتبة وسريعة لنتائج واضحة.",
-    subtitle: "Gemini 1.5 Flash • بث سلس • ماركداون • أكواد",
-    intro:
-      "مرحبًا بك في هارون أو إس. اسألني عن البرمجة، الدراسة، التلخيص، الصياغة، أو حل الأخطاء، وبعطيك جواب واضح وعملي.",
-    placeholder: [
-      "وش تبي أساعدك فيه؟",
-      "اسأل هارون أو إس...",
-      "ابدأ محادثة جديدة",
-    ],
-    clear: "محادثة جديدة",
-    retry: "إعادة التوليد",
-    thinking: "Gemini يفكر",
-    copied: "تم النسخ",
+    status: "نواة Gemini متصلة",
+    workspace: "مساحة المساعد",
+    newChat: "محادثة جديدة",
+    search: "ابحث في المحادثات...",
+    pinned: "مثبّتة",
+    recent: "المحادثات الأخيرة",
+    folders: "المجلدات",
+    noChats: "ما فيه محادثات محفوظة بعد",
+    tools: "أدوات السياق",
+    memory: "الذاكرة",
+    quick: "إجراءات سريعة",
+    upload: "إرفاق ملف",
+    voice: "إدخال صوتي",
+    send: "إرسال",
     copy: "نسخ",
-    sendHint: "Enter للإرسال • Shift+Enter لسطر جديد",
+    copied: "تم النسخ",
+    retry: "إعادة التوليد",
+    thinking: "هارون يفكر",
+    emptyTitle: "وش نبي نبني أو نصلح أو نفهم؟",
+    emptyText: "استخدم اقتراح سريع أو اكتب مباشرة. المساحة تحفظ سياقك وتخليه جاهز للمتابعة.",
+    hint: "Enter للإرسال. Shift+Enter لسطر جديد.",
     error: "صار خطأ في مسار الذكاء الاصطناعي.",
-    emptyTitle: "وش ننجز اليوم؟",
-    emptyText: "اختر اقتراح أو اكتب طلبك. الجلسة جديدة ونظيفة.",
-    suggestions: [
-      "حل مشكلة Flutter Firebase Auth",
-      "لخّص PDF إلى ملاحظات مذاكرة",
-      "أعد صياغة هذا الإيميل باحتراف",
-      "اشرح SQL joins بأمثلة",
-    ],
+    foldersList: ["الهندسة", "الدراسة", "الكتابة"],
+    actions: ["حلّل خطأ", "لخّص ملاحظات", "اكتب خطة إطلاق", "اشرح كود"],
+    placeholders: ["اسأل هارون أو إس أي شيء...", "الصق كود أو ملاحظات أو فكرة...", "خطّط، صحّح، لخّص، أو اكتب..."],
   },
 } as const;
 
@@ -96,14 +99,31 @@ function detectArabic(text: string) {
 
 export function AIChatAssistant() {
   const { lang, dir, setLanguage } = useLanguage();
+  const { profile, user } = useAuth();
   const copy = ui[lang];
-  const placeholder = useRotatingText([...copy.placeholder], 2200);
+  const placeholder = useRotatingText([...copy.placeholders], 2200);
+  const {
+    conversations,
+    currentConversation,
+    loadConversations,
+    startNewConversation,
+    switchConversation,
+    addMessage,
+    archiveCurrentConversation,
+  } = useConversations();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
+  const [query, setQuery] = useState("");
+  const [attachmentName, setAttachmentName] = useState("");
+  const [rightOpen, setRightOpen] = useState(true);
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    loadConversations();
+  }, [loadConversations]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
@@ -115,27 +135,32 @@ export function AIChatAssistant() {
     inputRef.current.style.height = `${Math.min(inputRef.current.scrollHeight, 180)}px`;
   }, [input]);
 
+  useEffect(() => {
+    if (!currentConversation || loading) return;
+    setMessages(currentConversation.messages.map((message) => ({ role: message.role, content: message.content })));
+  }, [currentConversation, loading]);
+
+  const filteredConversations = useMemo(
+    () => conversations.filter((conversation) => conversation.title.toLowerCase().includes(query.toLowerCase())),
+    [conversations, query],
+  );
+
   const payload = useMemo(
-    () =>
-      messages
-        .filter((message) => message.content.trim())
-        .map((message) => ({ role: message.role, content: message.content })),
+    () => messages.filter((message) => message.content.trim()).map((message) => ({ role: message.role, content: message.content })),
     [messages],
   );
 
   function resetChat() {
     setMessages([]);
     setInput("");
+    setAttachmentName("");
     inputRef.current?.focus();
   }
 
   function retryLast() {
     const lastUser = [...messages].reverse().find((message) => message.role === "user");
     if (!lastUser || loading) return;
-    setMessages((current) => {
-      const lastAssistantIndex = current.map((m) => m.role).lastIndexOf("assistant");
-      return lastAssistantIndex >= 0 ? current.slice(0, lastAssistantIndex) : current;
-    });
+    setMessages((current) => current.filter((message, index) => !(index === current.length - 1 && message.role === "assistant")));
     sendMessage(lastUser.content);
   }
 
@@ -152,12 +177,23 @@ export function AIChatAssistant() {
     const nextLanguage = detectArabic(normalized) ? "ar" : lang;
     if (nextLanguage !== lang) setLanguage(nextLanguage);
 
-    const userMessage: Message = { role: "user", content: normalized };
+    const userMessage: Message = {
+      role: "user",
+      content: attachmentName ? `${normalized}\n\n[${lang === "ar" ? "ملف مرفق" : "Attached file"}: ${attachmentName}]` : normalized,
+    };
+    let conversationId = currentConversation?.id;
     setMessages((current) => [...current, userMessage, { role: "assistant", content: "" }]);
     setInput("");
+    setAttachmentName("");
     setLoading(true);
 
     try {
+      if (!conversationId && messages.length === 0) {
+        conversationId = await startNewConversation(userMessage.content);
+      } else if (conversationId) {
+        await addMessage("user", userMessage.content, conversationId);
+      }
+
       const response = await fetch("/api/ai/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -185,22 +221,21 @@ export function AIChatAssistant() {
       if (!reader) {
         const text = await response.text();
         setAssistantText(text);
+        if (text && conversationId) await addMessage("assistant", text, conversationId);
         return;
       }
 
       const decoder = new TextDecoder();
       let assistantText = "";
-
       while (true) {
         const { done, value: chunk } = await reader.read();
         if (done) break;
         assistantText += decoder.decode(chunk, { stream: true });
         setAssistantText(assistantText);
       }
+      if (assistantText && conversationId) await addMessage("assistant", assistantText, conversationId);
     } catch (error) {
-      setAssistantText(
-        error instanceof Error ? `${copy.error}\n\n${error.message}` : copy.error,
-      );
+      setAssistantText(error instanceof Error ? `${copy.error}\n\n${error.message}` : copy.error);
     } finally {
       setLoading(false);
     }
@@ -221,199 +256,278 @@ export function AIChatAssistant() {
     }
   }
 
-  const hasConversation = messages.length > 0;
-
   return (
     <section
       id="ai-assistant"
-      className={cn(
-        "relative z-10 mx-auto min-h-screen max-w-7xl px-5 py-24 sm:px-8 lg:px-10",
-        dir === "rtl" && "font-arabic text-right",
-      )}
+      dir={dir}
+      className={cn("relative z-10 mx-auto max-w-[96rem] px-3 py-10 sm:px-5 lg:px-8", dir === "rtl" && "font-arabic text-right")}
     >
-      <div className="mb-8 grid gap-6 lg:grid-cols-[0.8fr_1.2fr] lg:items-end">
-        <div>
-          <motion.p
-            initial={{ opacity: 0, y: 12 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="mb-4 font-mono text-xs uppercase tracking-[0.38em] text-cyan-200/70"
-          >
-            {copy.eyebrow}
-          </motion.p>
-          <motion.h2
-            initial={{ opacity: 0, y: 18 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-4xl font-black tracking-tight text-white sm:text-6xl"
-          >
-            {copy.title}
-          </motion.h2>
-        </div>
-        <div className={cn("flex flex-wrap gap-2 lg:justify-end", dir === "rtl" && "lg:justify-start")}>
-          {copy.suggestions.map((starter) => (
-            <button
-              key={starter}
-              type="button"
-              onClick={() => sendMessage(starter)}
-              className="rounded-full border border-white/10 bg-white/[0.05] px-4 py-2 text-sm font-semibold text-white/62 transition hover:-translate-y-0.5 hover:border-cyan-200/40 hover:bg-cyan-300/10 hover:text-cyan-100"
-            >
-              {starter}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      <div className="overflow-hidden rounded-[2rem] border border-white/10 bg-white/[0.045] shadow-[0_0_90px_rgba(34,211,238,0.11)] backdrop-blur-2xl">
-        <div className="flex flex-wrap items-center justify-between gap-4 border-b border-white/10 px-5 py-4">
-          <div className="flex items-center gap-3">
-            <div className="relative grid size-11 place-items-center rounded-2xl bg-cyan-300/10 text-cyan-100">
-              <div className="absolute inset-0 animate-pulse rounded-2xl bg-cyan-300/10" />
-              <Bot className="relative size-5" />
-            </div>
+      <div className="grid min-h-[48rem] overflow-hidden rounded-[2rem] border border-white/10 bg-white/[0.045] shadow-[0_0_100px_rgba(34,211,238,0.12)] backdrop-blur-2xl lg:grid-cols-[18rem_minmax(0,1fr)_20rem]">
+        <aside className="hidden border-white/10 bg-black/22 p-4 lg:block ltr:border-r rtl:border-l">
+          <div className="mb-4 flex items-center justify-between gap-3">
             <div>
-              <p className="font-bold text-white">{copy.assistant}</p>
-              <p className="text-xs text-white/42">{copy.subtitle}</p>
+              <p className="text-xs font-bold uppercase tracking-[0.24em] text-cyan-100/60">{copy.workspace}</p>
+              <h2 className="mt-1 text-xl font-black text-white">{copy.assistant}</h2>
             </div>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            <button
-              type="button"
-              onClick={retryLast}
-              disabled={loading || !messages.some((message) => message.role === "user")}
-              className="inline-flex items-center gap-2 rounded-full border border-white/10 px-3 py-1.5 text-xs font-bold text-white/55 transition hover:text-white disabled:opacity-35"
-            >
-              <RefreshCw className="size-3" />
-              {copy.retry}
-            </button>
-            <button
-              type="button"
-              onClick={resetChat}
-              className="inline-flex items-center gap-2 rounded-full border border-white/10 px-3 py-1.5 text-xs font-bold text-white/55 transition hover:text-white"
-            >
-              <RotateCcw className="size-3" />
-              {copy.clear}
+            <button onClick={resetChat} className="grid size-10 place-items-center rounded-2xl bg-cyan-300 text-slate-950 transition hover:bg-white" aria-label={copy.newChat}>
+              <Plus className="size-5" />
             </button>
           </div>
-        </div>
-
-        <div className="h-[34rem] overflow-y-auto scroll-smooth p-4 sm:h-[38rem] sm:p-6">
-          {!hasConversation && (
-            <motion.div
-              initial={{ opacity: 0, y: 18, scale: 0.98 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              className="grid h-full place-items-center text-center"
-            >
-              <div className="max-w-xl">
-                <div className="mx-auto mb-6 grid size-16 place-items-center rounded-[1.4rem] border border-cyan-200/20 bg-cyan-300/10 text-cyan-100 shadow-[0_0_45px_rgba(34,211,238,0.16)]">
-                  <Sparkles className="size-7" />
-                </div>
-                <h3 className="text-3xl font-black text-white">{copy.emptyTitle}</h3>
-                <p className="mt-3 text-white/56">{copy.emptyText}</p>
-              </div>
-            </motion.div>
-          )}
-
-          <div className="space-y-6">
-            <AnimatePresence initial={false}>
-              {messages.map((message, index) => (
-                <motion.div
-                  key={`${message.role}-${index}`}
-                  initial={{ opacity: 0, y: 14, filter: "blur(8px)" }}
-                  animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+          <label className="mb-5 flex items-center gap-2 rounded-2xl border border-white/10 bg-black/30 px-3">
+            <Search className="size-4 text-white/38" />
+            <input
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder={copy.search}
+              className="h-11 w-full bg-transparent text-sm text-white outline-none placeholder:text-white/32"
+            />
+          </label>
+          <SidebarGroup title={copy.pinned} icon={<Pin className="size-4" />}>
+            <SidebarItem title={lang === "ar" ? "خطة إطلاق هارون" : "HARON launch plan"} active={false} />
+          </SidebarGroup>
+          <SidebarGroup title={copy.recent} icon={<Archive className="size-4" />}>
+            {filteredConversations.length ? (
+              filteredConversations.slice(0, 8).map((conversation) => (
+                <button
+                  key={conversation.id}
+                  type="button"
+                  onClick={() => switchConversation(conversation.id)}
                   className={cn(
-                    "flex gap-3",
-                    message.role === "user" && "justify-end",
+                    "block w-full truncate rounded-2xl px-3 py-2.5 text-start text-sm font-semibold transition",
+                    currentConversation?.id === conversation.id ? "bg-cyan-300/12 text-cyan-100" : "text-white/54 hover:bg-white/[0.06] hover:text-white",
                   )}
                 >
-                  {message.role === "assistant" && (
-                    <div className="mt-1 hidden size-9 shrink-0 place-items-center rounded-2xl bg-cyan-300/10 text-cyan-100 sm:grid">
-                      <Bot className="size-4" />
-                    </div>
-                  )}
-                  <div
-                    className={cn(
-                      "group max-w-[92%] rounded-[1.35rem] border p-4 leading-7 sm:max-w-[78%]",
-                      message.role === "user"
-                        ? "border-cyan-200/20 bg-cyan-300/12 text-white"
-                        : "border-white/10 bg-black/28 text-white/75",
-                    )}
-                  >
-                    {message.role === "assistant" ? (
-                      message.content ? (
-                        <MarkdownMessage content={message.content} />
-                      ) : (
-                        <TypingIndicator label={copy.thinking} />
-                      )
-                    ) : (
-                      <p className="whitespace-pre-wrap">{message.content}</p>
-                    )}
-                    {message.content && (
-                      <div className="mt-3 flex items-center gap-2 opacity-0 transition group-hover:opacity-100">
-                        <button
-                          type="button"
-                          onClick={() => copyMessage(message.content, index)}
-                          className="inline-flex items-center gap-2 rounded-full border border-white/10 px-2.5 py-1 text-xs font-bold text-white/42 transition hover:text-white"
-                        >
-                          {copiedIndex === index ? <Check className="size-3" /> : <Copy className="size-3" />}
-                          {copiedIndex === index ? copy.copied : copy.copy}
-                        </button>
-                      </div>
-                    )}
+                  {conversation.title}
+                </button>
+              ))
+            ) : (
+              <p className="rounded-2xl border border-white/10 bg-white/[0.03] px-3 py-3 text-sm text-white/40">{copy.noChats}</p>
+            )}
+          </SidebarGroup>
+          <SidebarGroup title={copy.folders} icon={<Folder className="size-4" />}>
+            {copy.foldersList.map((folder) => (
+              <SidebarItem key={folder} title={folder} active={false} />
+            ))}
+          </SidebarGroup>
+        </aside>
+
+        <div className="flex min-h-[48rem] flex-col">
+          <header className="flex items-center justify-between gap-3 border-b border-white/10 px-4 py-4 sm:px-5">
+            <div className="flex items-center gap-3">
+              <div className="relative grid size-11 place-items-center rounded-2xl bg-cyan-300/10 text-cyan-100">
+                <span className="absolute inset-0 animate-pulse rounded-2xl bg-cyan-300/10" />
+                <Bot className="relative size-5" />
+              </div>
+              <div>
+                <p className="font-black text-white">{copy.assistant}</p>
+                <p className="text-xs text-white/42">{copy.status}</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <button onClick={retryLast} disabled={loading || !messages.some((message) => message.role === "user")} className="grid size-10 place-items-center rounded-2xl border border-white/10 text-white/55 transition hover:text-cyan-100 disabled:opacity-35" aria-label={copy.retry}>
+                <RefreshCw className="size-4" />
+              </button>
+              <button onClick={() => setRightOpen((current) => !current)} className="grid size-10 place-items-center rounded-2xl border border-white/10 text-white/55 transition hover:text-cyan-100 lg:hidden" aria-label={copy.tools}>
+                <PanelRight className="size-4" />
+              </button>
+            </div>
+          </header>
+
+          <div className="flex-1 overflow-y-auto px-4 py-5 sm:px-6">
+            {!messages.length && (
+              <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="grid min-h-[30rem] place-items-center text-center">
+                <div className="max-w-2xl">
+                  <div className="mx-auto mb-6 grid size-20 place-items-center rounded-[1.75rem] border border-cyan-200/20 bg-cyan-300/10 text-cyan-100 shadow-[0_0_60px_rgba(34,211,238,0.18)]">
+                    <Sparkles className="size-9" />
                   </div>
-                </motion.div>
-              ))}
-            </AnimatePresence>
+                  <h3 className="text-3xl font-black text-white sm:text-5xl">{copy.emptyTitle}</h3>
+                  <p className="mx-auto mt-4 max-w-xl leading-8 text-white/56">{copy.emptyText}</p>
+                  <div className="mt-7 flex flex-wrap justify-center gap-2">
+                    {copy.actions.map((action) => (
+                      <button key={action} onClick={() => sendMessage(action)} className="rounded-full border border-white/10 bg-white/[0.05] px-4 py-2 text-sm font-bold text-white/62 transition hover:border-cyan-200/40 hover:text-cyan-100">
+                        {action}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </motion.div>
+            )}
+
+            <div className="space-y-6">
+              <AnimatePresence initial={false}>
+                {messages.map((message, index) => (
+                  <MessageBubble
+                    key={`${message.role}-${index}`}
+                    message={message}
+                    index={index}
+                    userName={profile?.name || user?.displayName || "You"}
+                    copied={copiedIndex === index}
+                    copyLabel={copiedIndex === index ? copy.copied : copy.copy}
+                    onCopy={() => copyMessage(message.content, index)}
+                  />
+                ))}
+              </AnimatePresence>
+            </div>
+            <div ref={bottomRef} />
           </div>
-          <div ref={bottomRef} />
+
+          <footer className="border-t border-white/10 bg-black/18 p-3 sm:p-4">
+            {attachmentName && (
+              <div className="mb-2 inline-flex items-center gap-2 rounded-full border border-cyan-200/20 bg-cyan-300/10 px-3 py-1 text-xs font-bold text-cyan-100">
+                <FileUp className="size-3" />
+                {attachmentName}
+              </div>
+            )}
+            <form
+              onSubmit={(event) => {
+                event.preventDefault();
+                sendMessage();
+              }}
+              className="relative rounded-[1.5rem] border border-cyan-200/20 bg-black/45 p-2 shadow-[0_0_42px_rgba(34,211,238,0.11)] transition focus-within:border-cyan-200/55"
+            >
+              <div className="flex items-end gap-2">
+                <label className="grid size-11 shrink-0 cursor-pointer place-items-center rounded-2xl border border-white/10 text-white/50 transition hover:text-cyan-100" title={copy.upload}>
+                  <FileUp className="size-5" />
+                  <input type="file" className="hidden" onChange={(event) => setAttachmentName(event.target.files?.[0]?.name || "")} />
+                </label>
+                <textarea
+                  ref={inputRef}
+                  value={input}
+                  rows={1}
+                  onChange={(event) => setInput(event.target.value)}
+                  onKeyDown={handleKeyDown}
+                  placeholder={placeholder}
+                  className="max-h-44 min-h-11 flex-1 resize-none bg-transparent px-2 py-3 leading-7 text-white outline-none placeholder:text-white/34"
+                />
+                <button type="button" className="grid size-11 shrink-0 place-items-center rounded-2xl border border-white/10 text-white/50 transition hover:text-cyan-100" title={copy.voice}>
+                  <Mic className="size-5" />
+                </button>
+                <button type="submit" disabled={loading || !input.trim()} className="grid size-11 shrink-0 place-items-center rounded-2xl bg-cyan-300 text-slate-950 shadow-[0_0_28px_rgba(34,211,238,0.24)] transition hover:bg-white disabled:opacity-45" title={copy.send}>
+                  {loading ? <Loader2 className="size-5 animate-spin" /> : <Send className="size-5" />}
+                </button>
+              </div>
+            </form>
+            <p className="mt-2 px-2 text-xs text-white/35">{copy.hint}</p>
+          </footer>
         </div>
 
-        <div className="border-t border-white/10 p-3 sm:p-4">
-          <form
-            onSubmit={(event) => {
-              event.preventDefault();
-              sendMessage();
-            }}
-            className="relative rounded-[1.6rem] border border-white/10 bg-black/35 p-3 shadow-[inset_0_0_30px_rgba(255,255,255,0.025)] transition focus-within:border-cyan-200/45"
-          >
-            <textarea
-              ref={inputRef}
-              value={input}
-              rows={1}
-              onChange={(event) => setInput(event.target.value)}
-              onKeyDown={handleKeyDown}
-              placeholder={placeholder}
-              className="max-h-44 min-h-12 w-full resize-none bg-transparent py-3 pl-4 pr-16 leading-7 text-white outline-none placeholder:text-white/34 rtl:pl-16 rtl:pr-4"
-            />
-            <button
-              type="submit"
-              disabled={loading || !input.trim()}
-              className="absolute bottom-3 right-3 grid size-11 place-items-center rounded-2xl bg-cyan-300 text-slate-950 shadow-[0_0_28px_rgba(34,211,238,0.24)] transition hover:bg-white disabled:opacity-45 rtl:left-3 rtl:right-auto"
-            >
-              {loading ? <Loader2 className="size-5 animate-spin" /> : <Send className="size-5" />}
+        <aside className={cn("border-white/10 bg-black/20 p-4 lg:block ltr:border-l rtl:border-r", rightOpen ? "block" : "hidden")}>
+          <PanelCard title={copy.tools} icon={<WandSparkles className="size-4" />}>
+            {copy.actions.map((action) => (
+              <button key={action} onClick={() => sendMessage(action)} className="w-full rounded-2xl border border-white/10 bg-white/[0.035] px-3 py-2.5 text-start text-sm font-semibold text-white/58 transition hover:border-cyan-200/35 hover:text-cyan-100">
+                {action}
+              </button>
+            ))}
+          </PanelCard>
+          <PanelCard title={copy.memory} icon={<Sparkles className="size-4" />}>
+            <p className="text-sm leading-7 text-white/52">
+              {lang === "ar"
+                ? "يحفظ هارون المحادثات للحسابات المسجلة ويستخدم السياق الحالي فقط عند الرد."
+                : "HARON saves conversations for signed-in users and uses the current context when responding."}
+            </p>
+          </PanelCard>
+          {currentConversation && (
+            <button onClick={archiveCurrentConversation} className="mt-4 w-full rounded-2xl border border-red-200/15 bg-red-400/10 px-4 py-3 text-sm font-bold text-red-100/75 transition hover:text-red-100">
+              {lang === "ar" ? "أرشفة المحادثة" : "Archive chat"}
             </button>
-          </form>
-          <p className="mt-2 px-2 text-xs text-white/35">{copy.sendHint}</p>
-        </div>
+          )}
+        </aside>
       </div>
     </section>
   );
 }
 
-function TypingIndicator({ label }: { label: string }) {
+function MessageBubble({
+  message,
+  index,
+  userName,
+  copied,
+  copyLabel,
+  onCopy,
+}: {
+  message: Message;
+  index: number;
+  userName: string;
+  copied: boolean;
+  copyLabel: string;
+  onCopy: () => void;
+}) {
+  const isUser = message.role === "user";
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 14, filter: "blur(8px)" }}
+      animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+      className={cn("flex gap-3", isUser && "justify-end")}
+    >
+      {!isUser && <Avatar icon={<Bot className="size-4" />} />}
+      <div className={cn("group max-w-[92%] sm:max-w-[78%]", isUser && "order-first")}>
+        <div className={cn("mb-2 flex items-center gap-2 text-xs text-white/34", isUser && "justify-end")}>
+          <span>{isUser ? userName : "HARON OS"}</span>
+          <span>{new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</span>
+        </div>
+        <div className={cn("rounded-[1.35rem] border p-4 leading-7", isUser ? "border-cyan-200/20 bg-cyan-300/12 text-white" : "border-white/10 bg-black/30 text-white/75")}>
+          {isUser ? (
+            <p className="whitespace-pre-wrap">{message.content}</p>
+          ) : message.content ? (
+            <MarkdownMessage content={message.content} />
+          ) : (
+            <TypingIndicator />
+          )}
+        </div>
+        {message.content && (
+          <button onClick={onCopy} className={cn("mt-2 inline-flex items-center gap-2 rounded-full border border-white/10 px-2.5 py-1 text-xs font-bold text-white/38 opacity-0 transition hover:text-white group-hover:opacity-100", isUser && "float-right")}>
+            {copied ? <Check className="size-3" /> : <Copy className="size-3" />}
+            {copyLabel}
+          </button>
+        )}
+      </div>
+      {isUser && <Avatar icon={<UserRound className="size-4" />} />}
+    </motion.div>
+  );
+}
+
+function Avatar({ icon }: { icon: React.ReactNode }) {
+  return <div className="mt-7 hidden size-9 shrink-0 place-items-center rounded-2xl bg-cyan-300/10 text-cyan-100 sm:grid">{icon}</div>;
+}
+
+function TypingIndicator() {
   return (
     <div className="flex items-center gap-3 text-cyan-100/75">
       <Loader2 className="size-4 animate-spin" />
-      <span className="text-sm font-semibold">{label}</span>
       <span className="flex gap-1">
         {[0, 1, 2].map((item) => (
-          <span
-            key={item}
-            className="size-1.5 animate-bounce rounded-full bg-cyan-200/70"
-            style={{ animationDelay: `${item * 110}ms` }}
-          />
+          <span key={item} className="size-1.5 animate-bounce rounded-full bg-cyan-200/70" style={{ animationDelay: `${item * 110}ms` }} />
         ))}
       </span>
     </div>
+  );
+}
+
+function SidebarGroup({ title, icon, children }: { title: string; icon: React.ReactNode; children: React.ReactNode }) {
+  return (
+    <div className="mb-5">
+      <div className="mb-2 flex items-center gap-2 px-1 text-xs font-black uppercase tracking-[0.2em] text-white/35">
+        {icon}
+        {title}
+      </div>
+      <div className="space-y-1">{children}</div>
+    </div>
+  );
+}
+
+function SidebarItem({ title, active }: { title: string; active: boolean }) {
+  return <div className={cn("truncate rounded-2xl px-3 py-2.5 text-sm font-semibold", active ? "bg-cyan-300/12 text-cyan-100" : "text-white/48")}>{title}</div>;
+}
+
+function PanelCard({ title, icon, children }: { title: string; icon: React.ReactNode; children: React.ReactNode }) {
+  return (
+    <section className="mb-4 rounded-[1.35rem] border border-white/10 bg-white/[0.035] p-4">
+      <div className="mb-3 flex items-center gap-2 text-cyan-100">
+        {icon}
+        <h3 className="font-black text-white">{title}</h3>
+      </div>
+      <div className="space-y-2">{children}</div>
+    </section>
   );
 }

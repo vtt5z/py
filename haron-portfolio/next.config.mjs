@@ -144,17 +144,6 @@ const nextConfig = {
   ],
 
   /**
-   * PRODUCTION: Redirects
-   */
-  redirects: async () => [
-    {
-      source: "/tools",
-      destination: "/tools/sql",
-      permanent: false,
-    },
-  ],
-
-  /**
    * SAFE WEBPACK CONFIG
    */
   webpack: (config) => {

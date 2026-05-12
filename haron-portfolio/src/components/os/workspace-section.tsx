@@ -24,6 +24,17 @@ export function WorkspaceSection() {
           ["Prompt History", "Reuse useful prompts and workflows.", Clock3],
           ["Quick Actions", "Summarize, translate, or analyze in one step.", Sparkles],
         ];
+  const modules = lang === "ar"
+    ? [
+        ["مساحة الذكاء", "حادث، اكتب، حلّل، ونظّم العمل من مساحة واحدة.", "نواة النظام"],
+        ["أدوات ذكية", "مساعدات للكتابة والسيرة وPDF والصور والدراسة.", "ذكاء إبداعي"],
+        ["أدوات المطور", "JSON وRegex وSQL وAPI وشرح الكود وتصحيح الأخطاء.", "هندسة"],
+        ["مركز الطالب", "ملاحظات واختبارات وبطاقات وشرح وخطط تعلم.", "تعلم"],
+      ]
+    : workspaceModules.map((module) => [module.title, module.text, module.status]);
+  const signals = lang === "ar"
+    ? ["مسارات API آمنة", "استجابات Gemini", "Firebase جاهز", "Vercel جاهز", "حدود استخدام", "ذاكرة الذكاء", "لوحات مباشرة", "معمارية إنتاجية"]
+    : systemSignals.map((signal) => signal.label);
 
   return (
     <section
@@ -47,10 +58,10 @@ export function WorkspaceSection() {
         </p>
       </div>
       <div className="grid gap-5 lg:grid-cols-4">
-        {workspaceModules.map((module) => (
-          <OSCard key={module.title} title={module.title} text={module.text} icon={module.icon}>
+        {workspaceModules.map((module, index) => (
+          <OSCard key={module.title} title={modules[index][0]} text={modules[index][1]} icon={module.icon}>
             <span className="mt-6 inline-flex rounded-full border border-cyan-200/20 bg-cyan-300/10 px-3 py-1 text-xs font-bold uppercase tracking-[0.18em] text-cyan-100/70">
-              {module.status}
+              {modules[index][2]}
             </span>
           </OSCard>
         ))}
@@ -70,10 +81,10 @@ export function WorkspaceSection() {
         viewport={{ once: true }}
         className="mt-6 grid gap-3 rounded-[1.75rem] border border-white/10 bg-white/[0.035] p-5 backdrop-blur-2xl sm:grid-cols-2 lg:grid-cols-4"
       >
-        {systemSignals.map((signal) => (
+        {systemSignals.map((signal, index) => (
           <div key={signal.label} className="flex items-center gap-3 rounded-2xl bg-white/[0.04] p-3">
             <signal.icon className="size-5 text-cyan-100" />
-            <span className="text-sm font-semibold text-white/70">{signal.label}</span>
+            <span className="text-sm font-semibold text-white/70">{signals[index]}</span>
           </div>
         ))}
       </motion.div>

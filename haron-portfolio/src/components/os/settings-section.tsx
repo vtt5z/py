@@ -4,15 +4,21 @@ import { CheckCircle2, DatabaseZap, KeyRound, LockKeyhole, UploadCloud } from "l
 
 import { useLanguage } from "@/components/providers/language-provider";
 
-const settings = [
-  { title: "Gemini API", value: "GEMINI_API_KEY", text: "Server-only key for chat, writing, PDF, screenshot, resume, and SQL generation.", icon: KeyRound },
-  { title: "Supabase URL", value: "NEXT_PUBLIC_SUPABASE_URL", text: "Public project URL for auth and client-side services.", icon: DatabaseZap },
-  { title: "Supabase Anon Key", value: "NEXT_PUBLIC_SUPABASE_ANON_KEY", text: "Public anonymous key for client auth flows.", icon: LockKeyhole },
-  { title: "Storage System", value: "Supabase Storage", text: "Ready for uploaded PDFs, screenshots, generated resumes, and user files.", icon: UploadCloud },
-];
-
 export function SettingsSection() {
   const { lang } = useLanguage();
+  const settings = lang === "ar"
+    ? [
+        { title: "واجهة Gemini", value: "GEMINI_API_KEY", text: "مفتاح خادم فقط للمحادثة والكتابة وPDF والصور والسيرة وتوليد SQL.", icon: KeyRound },
+        { title: "مشروع Firebase", value: "NEXT_PUBLIC_FIREBASE_PROJECT_ID", text: "معرّف مشروع Firebase للمصادقة وملفات Firestore وخدمات العميل الفورية.", icon: DatabaseZap },
+        { title: "مصادقة Firebase", value: "NEXT_PUBLIC_FIREBASE_API_KEY", text: "مفتاح آمن للمتصفح يعمل مع النطاقات المصرّح بها وقواعد Firestore.", icon: LockKeyhole },
+        { title: "نظام التخزين", value: "Firebase Storage", text: "جاهز للصور الشخصية وملفات PDF والصور والسير الذاتية وملفات المستخدم.", icon: UploadCloud },
+      ]
+    : [
+        { title: "Gemini API", value: "GEMINI_API_KEY", text: "Server-only key for chat, writing, PDF, screenshot, resume, and SQL generation.", icon: KeyRound },
+        { title: "Firebase Project", value: "NEXT_PUBLIC_FIREBASE_PROJECT_ID", text: "Public Firebase project ID for Auth, Firestore profiles, and realtime client services.", icon: DatabaseZap },
+        { title: "Firebase Auth", value: "NEXT_PUBLIC_FIREBASE_API_KEY", text: "Browser-safe Firebase key used with protected Auth domains and Firestore rules.", icon: LockKeyhole },
+        { title: "Storage System", value: "Firebase Storage", text: "Ready for avatars, uploaded PDFs, screenshots, generated resumes, and user files.", icon: UploadCloud },
+      ];
 
   return (
     <section className="relative z-10 mx-auto max-w-7xl px-5 py-12 sm:px-8 lg:px-10">
@@ -32,7 +38,7 @@ export function SettingsSection() {
         <div className="flex items-start gap-4">
           <CheckCircle2 className="mt-1 size-6 text-emerald-200" />
           <div>
-            <h3 className="text-2xl font-black text-white">Secure by default</h3>
+            <h3 className="text-2xl font-black text-white">{lang === "ar" ? "آمن افتراضيًا" : "Secure by default"}</h3>
             <p className="mt-3 max-w-4xl text-white/60">
               {lang === "ar"
                 ? "مفاتيح API لا تُكتب داخل الكود. هارون أو إس يقرأ الأسرار من متغيرات البيئة ويشغّل Gemini من مسارات آمنة على الخادم."

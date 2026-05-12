@@ -1,9 +1,12 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Bot, Command, Cpu, Languages } from "lucide-react";
+import { Bot, Command, Cpu, Languages, Menu, X } from "lucide-react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useState } from "react";
 
+import { UserMenu } from "@/components/auth/user-menu";
 import { useLanguage } from "@/components/providers/language-provider";
 import { platformPages } from "@/lib/haron-os-content";
 
@@ -18,6 +21,8 @@ const links = [
 
 export function OSNavbar() {
   const { lang, toggleLanguage } = useLanguage();
+  const pathname = usePathname();
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
     <>
@@ -41,7 +46,7 @@ export function OSNavbar() {
             <Link
               key={item.href}
               href={item.href}
-              className="rounded-full px-4 py-2 text-sm font-semibold text-white/56 transition hover:bg-white/10 hover:text-cyan-100"
+              className={`rounded-full px-4 py-2 text-sm font-semibold transition ${pathname === item.href ? "bg-cyan-300/12 text-cyan-100" : "text-white/56 hover:bg-white/10 hover:text-cyan-100"}`}
             >
               {item[lang]}
             </Link>
@@ -55,15 +60,41 @@ export function OSNavbar() {
           <Languages className="size-4" />
           {lang === "en" ? "AR" : "EN"}
         </button>
-        <Link
-          href="/ai"
-          className="inline-flex h-10 items-center gap-2 rounded-full border border-cyan-200/25 bg-cyan-300/10 px-4 text-sm font-bold text-cyan-100 transition hover:bg-cyan-300 hover:text-slate-950"
-        >
-          <Bot className="size-4" />
-          <span className="hidden sm:inline">{lang === "ar" ? "شغّل المساعد" : "Launch AI"}</span>
-          <Command className="size-4 sm:hidden" />
-        </Link>
+        <div className="flex items-center gap-2">
+          <UserMenu compact />
+          <button
+            type="button"
+            onClick={() => setMobileOpen((current) => !current)}
+            className="grid size-10 place-items-center rounded-full border border-white/10 bg-white/[0.05] text-white/70 lg:hidden"
+            aria-label={lang === "ar" ? "فتح القائمة" : "Open menu"}
+          >
+            {mobileOpen ? <X className="size-5" /> : <Menu className="size-5" />}
+          </button>
+          <Link
+            href="/ai"
+            className="inline-flex h-10 items-center gap-2 rounded-full border border-cyan-200/25 bg-cyan-300/10 px-4 text-sm font-bold text-cyan-100 transition hover:bg-cyan-300 hover:text-slate-950"
+          >
+            <Bot className="size-4" />
+            <span className="hidden sm:inline">{lang === "ar" ? "شغّل المساعد" : "Launch AI"}</span>
+            <Command className="size-4 sm:hidden" />
+          </Link>
+        </div>
       </nav>
+      {mobileOpen && (
+        <div className="mx-auto mt-3 max-w-7xl rounded-[1.35rem] border border-white/10 bg-[#050816]/92 p-2 shadow-[0_24px_80px_rgba(0,0,0,0.42)] backdrop-blur-2xl lg:hidden">
+          {links.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              onClick={() => setMobileOpen(false)}
+              className={`flex items-center justify-between rounded-2xl px-4 py-3 text-sm font-bold transition ${pathname === item.href ? "bg-cyan-300/12 text-cyan-100" : "text-white/62 hover:bg-white/10 hover:text-white"}`}
+            >
+              {item[lang]}
+              <span className="size-1.5 rounded-full bg-cyan-200/50" />
+            </Link>
+          ))}
+        </div>
+      )}
       </motion.header>
       <aside className="fixed bottom-4 left-4 right-4 z-40 rounded-[1.5rem] border border-white/10 bg-[#050816]/80 p-2 shadow-[0_0_45px_rgba(34,211,238,0.1)] backdrop-blur-2xl lg:bottom-4 lg:left-4 lg:right-auto lg:top-4 lg:w-20 rtl:lg:left-auto rtl:lg:right-4">
         <div className="flex items-center justify-between gap-1 overflow-x-auto lg:h-full lg:flex-col lg:overflow-visible">
@@ -90,6 +121,9 @@ export function OSNavbar() {
           >
             <Languages className="size-5" />
           </button>
+          <div className="hidden lg:block">
+            <UserMenu compact />
+          </div>
         </div>
       </aside>
     </>

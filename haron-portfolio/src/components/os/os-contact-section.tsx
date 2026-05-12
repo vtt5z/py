@@ -13,20 +13,28 @@ const contacts = [
 ];
 
 export function OSContactSection() {
-  const { lang } = useLanguage();
+  const { lang, dir } = useLanguage();
+  const localizedContacts = lang === "ar"
+    ? [
+        { title: "الجنسية اليمنية", text: "إشارة هوية أنيقة خارج عنوان الصفحة.", icon: ShieldCheck },
+        { title: "الموقع الحالي", text: "الهند", icon: MapPin },
+        { title: "الهاتف", text: "+91 8699164650", icon: Phone },
+        { title: "البريد الإلكتروني", text: "mhamad2129@gmail.com", icon: Mail },
+      ]
+    : contacts;
 
   return (
-    <section id="contact" className="relative z-10 mx-auto max-w-7xl px-5 py-28 sm:px-8 lg:px-10">
+    <section id="contact" className={`relative z-10 mx-auto max-w-7xl px-5 py-28 sm:px-8 lg:px-10 ${dir === "rtl" ? "font-arabic text-right" : ""}`}>
       <div className="mb-12 max-w-4xl">
         <p className="mb-4 font-mono text-xs uppercase tracking-[0.38em] text-cyan-200/70">
-          Contact Signal
+          {lang === "ar" ? "قناة التواصل" : "Contact Signal"}
         </p>
         <h2 className="text-4xl font-black tracking-tight text-white sm:text-6xl">
           {lang === "ar" ? "تواصل مع المهندس خلف هارون أو إس." : "Connect with the engineer behind HARON OS."}
         </h2>
       </div>
       <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
-        {contacts.map((contact) => (
+        {localizedContacts.map((contact) => (
           <OSCard key={contact.title} title={contact.title} text={contact.text} icon={contact.icon} />
         ))}
       </div>

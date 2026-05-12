@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { Languages } from "lucide-react";
 
+import { UserMenu } from "@/components/auth/user-menu";
 import { useLanguage } from "@/components/providers/language-provider";
 import { cn } from "@/lib/utils";
 
@@ -45,14 +46,17 @@ export function Navbar() {
           ))}
         </div>
 
-        <button
-          type="button"
-          onClick={toggleLanguage}
-          className="inline-flex h-10 items-center gap-2 rounded-full border border-violet-200/20 bg-white/[0.06] px-4 text-sm font-bold text-white transition hover:border-cyan-200/60 hover:bg-cyan-300/10"
-        >
-          <Languages className="size-4" />
-          {lang === "en" ? "AR" : "EN"}
-        </button>
+        <div className="flex items-center gap-2">
+          <UserMenu compact />
+          <button
+            type="button"
+            onClick={toggleLanguage}
+            className="inline-flex h-10 items-center gap-2 rounded-full border border-violet-200/20 bg-white/[0.06] px-4 text-sm font-bold text-white transition hover:border-cyan-200/60 hover:bg-cyan-300/10"
+          >
+            <Languages className="size-4" />
+            {lang === "en" ? "AR" : "EN"}
+          </button>
+        </div>
       </nav>
     </motion.header>
   );
