@@ -1,10 +1,7 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 
 import {
-  detectInputLanguage,
   streamChatCompletion,
-  type AssistantLanguage,
-  type ChatMessage,
 } from "@/services/gemini";
 import { checkUsageLimit } from "@/services/usage-limits";
 import {
@@ -91,31 +88,11 @@ export async function POST(request: NextRequest) {
 
     const { language, messages, context } = validation;
 
-    // SECURITY: Inject server-side system prompt only
-    // Never trust frontend for system instructions
-    const systemPrompt = [
-      "You are the live HARON OS assistant.",
-      "Keep responses concise, practical, warm, and product-grade.",
-      "Avoid fake sci-fi theatrics and verbose filler.",
-      "Prefer useful steps, clear formatting, and direct answers.",
-      context
-        ? `Runtime context: locale=${context.locale ?? "unknown"}, timezone=${context.timezone ?? "unknown"}, localTime=${context.localTime ?? "unknown"}, device=${context.device ?? "unknown"}.`
-        : "Runtime context: unknown",
-    ].join(" ");
-
-    const safeMessages: ChatMessage[] = [
-      {
-        role: "system",
-        content: systemPrompt,
-      },
-      ...messages,
-    ];
-
     // PRODUCTION: Track request start
     const aiStartTime = performance.now();
 
     // SECURITY: Generate stream with validated data
-    const stream = await streamChatCompletion(safeMessages, language);
+    const stream = await streamChatCompletion(messages, language, context);
 
     // PRODUCTION: Track performance
     const aiEndTime = performance.now();

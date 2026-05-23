@@ -9,15 +9,15 @@
  * - Error handling
  */
 
-import { type ChatRole, type ChatMessage, type AssistantLanguage } from "@/services/gemini";
+import { type ChatMessage, type AssistantLanguage } from "@/services/gemini";
 
 /**
- * SECURITY: Prevent frontend from injecting roles
- * Only allow "user" role for frontend requests
+ * SECURITY: Prevent frontend from injecting privileged roles.
+ * Chat history may include user/assistant turns, but never system/tool roles.
  */
 export function sanitizeChatMessages(
   messages: unknown,
-  maxMessages = 16,
+  maxMessages = 10,
 ): ChatMessage[] {
   if (!Array.isArray(messages)) {
     return [];
@@ -38,11 +38,10 @@ export function sanitizeChatMessages(
         return false;
       }
 
-      // SECURITY: Frontend can ONLY send "user" role
-      // System prompts are injected server-side only
-      if (m.role !== "user") {
+      // SECURITY: System prompts are injected server-side only.
+      if (m.role !== "user" && m.role !== "assistant") {
         console.warn(
-          `[SECURITY] Rejected message with role "${m.role}" from frontend. Frontend can only send "user" role.`,
+          `[SECURITY] Rejected message with role "${m.role}" from frontend.`,
         );
         return false;
       }
@@ -50,7 +49,7 @@ export function sanitizeChatMessages(
       return true;
     })
     .map((msg) => ({
-      role: "user" as const, // Force "user" role regardless
+      role: msg.role === "assistant" ? ("assistant" as const) : ("user" as const),
       content: msg.content.trim(),
     }))
     .filter((msg) => msg.content.length > 0 && msg.content.length <= 8000);
@@ -84,7 +83,7 @@ export function validateChatRequest(body: unknown): {
       : "en";
 
   // Sanitize messages
-  const messages = sanitizeChatMessages(req.messages, 16);
+  const messages = sanitizeChatMessages(req.messages, 10);
 
   // Validate and limit context
   const context =

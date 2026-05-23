@@ -45,6 +45,7 @@ import { createUsernameSeed } from "@/lib/auth-copy";
 import type { UserProfile, AuthUser } from "@/types/auth";
 
 const OWNER_EMAILS = (process.env.NEXT_PUBLIC_OWNER_EMAILS || "").split(",").filter(Boolean);
+const EMAIL_VERIFICATION_COOLDOWN_MS = 5 * 60 * 1000;
 
 /**
  * Convert Firebase User to AuthUser
@@ -196,6 +197,7 @@ export async function signInWithGoogleProvider(): Promise<User> {
       authError.code === "auth/popup-blocked" ||
       authError.code === "auth/popup-closed-by-user" ||
       authError.code === "auth/cancelled-popup-request" ||
+      authError.code === "auth/internal-error" ||
       authError.code === "auth/operation-not-supported-in-this-environment"
     ) {
       await signInWithRedirect(auth, provider);
@@ -278,7 +280,7 @@ export async function signUpWithEmailPassword(
   // Send verification email
   try {
     await sendEmailVerification(user, {
-      url: `${process.env.NEXT_PUBLIC_APP_URL}/auth/verify-email?uid=${user.uid}`,
+      url: `${process.env.NEXT_PUBLIC_APP_URL || window.location.origin}/auth/verify-email?uid=${user.uid}`,
     });
   } catch (error) {
     console.error("Failed to send verification email", error);
@@ -417,9 +419,23 @@ export async function sendVerificationEmailToUser(): Promise<void> {
     throw new Error("No user signed in");
   }
 
+  const cooldownKey = `haron:verification-resend:${user.uid}`;
+  const now = Date.now();
+  const lastSent = typeof window !== "undefined" ? Number(window.localStorage.getItem(cooldownKey) || "0") : 0;
+  const remaining = EMAIL_VERIFICATION_COOLDOWN_MS - (now - lastSent);
+
+  if (remaining > 0) {
+    const minutes = Math.ceil(remaining / 60000);
+    throw new Error(`Please wait ${minutes} minute${minutes === 1 ? "" : "s"} before resending verification email.`);
+  }
+
   await sendEmailVerification(user, {
     url: `${process.env.NEXT_PUBLIC_APP_URL || window.location.origin}/auth/verify-email?uid=${user.uid}`,
   });
+
+  if (typeof window !== "undefined") {
+    window.localStorage.setItem(cooldownKey, String(now));
+  }
 }
 
 export async function refreshCurrentUser(): Promise<AuthUser | null> {
@@ -516,8 +532,10 @@ export function getAuthErrorMessage(error: unknown): string {
     "auth/popup-closed-by-user": "Sign in was cancelled.",
     "auth/popup-blocked": "Popup was blocked. HARON OS will try redirect sign-in.",
     "auth/cancelled-popup-request": "Sign in request was cancelled.",
+    "auth/internal-error": "Google sign-in could not finish in a popup. Try again, or make sure Firebase Auth has localhost and your Vercel domain authorized.",
     "auth/invalid-credential": "Invalid email or password.",
     "auth/network-request-failed": "Network error. Check your connection.",
+    "auth/too-many-requests": "Too many attempts. Please wait a few minutes before trying again.",
     "auth/unauthorized-domain": "This domain is not authorized in Firebase Authentication. Add localhost and your Vercel domain in Firebase Console > Authentication > Settings > Authorized domains.",
   };
 

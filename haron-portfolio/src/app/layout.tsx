@@ -9,6 +9,8 @@ import {
 import { createMetadata, createJsonLd } from "@/lib/seo";
 import { AuthProvider } from "@/components/providers/auth-provider";
 import { LanguageProvider } from "@/components/providers/language-provider";
+import { PWARegister } from "@/components/pwa/pwa-register";
+import { ToastProvider } from "@/components/providers/toast-provider";
 import "./globals.css";
 
 const inter = Inter({
@@ -44,7 +46,11 @@ const tajawal = Tajawal({
 /**
  * PRODUCTION SEO: Comprehensive metadata
  */
-export const metadata: Metadata = createMetadata();
+const baseMetadata = createMetadata();
+export const metadata: Metadata = {
+  ...baseMetadata,
+  manifest: "/manifest.json",
+};
 
 export default function RootLayout({
   children,
@@ -69,7 +75,10 @@ export default function RootLayout({
       <body className="min-h-full overflow-x-hidden bg-[#02030a] text-white">
         <AuthProvider>
           <LanguageProvider>
-            {children}
+            <ToastProvider>
+              {children}
+              <PWARegister />
+            </ToastProvider>
           </LanguageProvider>
         </AuthProvider>
         {/* PRODUCTION: Vercel Analytics */}

@@ -9,6 +9,12 @@ export type ChatMessage = {
 };
 
 export type AssistantLanguage = "en" | "ar";
+export type RuntimeContext = {
+  locale?: string;
+  timezone?: string;
+  localTime?: string;
+  device?: string;
+};
 
 const GEMINI_MODEL =
   process.env.GEMINI_MODEL?.trim() ||
@@ -51,19 +57,12 @@ function createTextStream(text: string, chunkSize = 14) {
   });
 }
 
-/**
- * SECURITY: Clean messages and enforce safe role mapping
- * 
- * Frontend messages MUST be "user" role only.
- * This prevents system prompt injection and role escalation.
- */
 function cleanMessages(messages: ChatMessage[]) {
   return messages
-    .filter((message) => message.content?.trim())
-    .slice(-16)
+    .filter((message) => message.content?.trim() && (message.role === "user" || message.role === "assistant" || message.role === "model"))
+    .slice(-10)
     .map((message) => ({
-
-      role: ("user" as const),
+      role: message.role === "model" ? ("assistant" as const) : message.role,
       content: message.content.trim(),
     }));
 }
@@ -74,12 +73,13 @@ export function detectInputLanguage(text: string): AssistantLanguage {
 
 export function buildAssistantSystemPrompt(language: AssistantLanguage) {
   const shared = [
-    "You are HARON, a modern AI workspace assistant built for engineers and learners.",
-    "Be natural, concise, practical, and helpful. Avoid robotic language and unnecessary system phrases.",
+    "You are HARON OS, a premium AI workspace assistant for builders, founders, engineers, students, and operators.",
+    "You feel polished, calm, precise, and highly capable, like a modern SaaS copiloting layer rather than a chatbot.",
+    "Be natural, concise, practical, and helpful. Avoid robotic language, fake theatrics, and unnecessary system phrases.",
     "Use clean markdown with short headings, bullets only when useful, and code blocks for code.",
-    "Do not sound like an operating system. Respond like a premium AI productivity platform.",
+    "Keep the answer directly useful: explain, decide, debug, design, or write with confidence.",
     "When debugging, include likely cause, fix, and verification.",
-    "Support both English and Arabic naturally.",
+    "Never claim to have performed actions you did not perform. Ask one clear question only when necessary.",
   ].join(" ");
 
   if (language === "ar") {
@@ -98,11 +98,23 @@ export function buildAssistantSystemPrompt(language: AssistantLanguage) {
   ].join(" ");
 }
 
-function messagesToPrompt(messages: ChatMessage[], language: AssistantLanguage) {
+function formatRuntimeContext(context?: RuntimeContext) {
+  if (!context) return "";
+
+  return [
+    context.locale ? `Locale: ${context.locale}` : "",
+    context.timezone ? `Timezone: ${context.timezone}` : "",
+    context.localTime ? `Local time: ${context.localTime}` : "",
+    context.device ? `Device: ${context.device}` : "",
+  ].filter(Boolean).join("\n");
+}
+
+function messagesToPrompt(messages: ChatMessage[], language: AssistantLanguage, context?: RuntimeContext) {
   /**
    * SECURITY: Build prompt safely
    * - System prompts only from server (never from frontend messages)
-   * - All frontend messages are forced to "user" role
+   * - Frontend system role messages are discarded
+   * - Only the last 10 user/assistant messages are retained
    * - No system prompt extraction from user content
    */
   const dialogue = cleanMessages(messages)
@@ -114,6 +126,7 @@ function messagesToPrompt(messages: ChatMessage[], language: AssistantLanguage) 
 
   return [
     buildAssistantSystemPrompt(language),
+    formatRuntimeContext(context) ? `Runtime context:\n${formatRuntimeContext(context)}` : "",
     "Conversation:",
     dialogue || "User: Open HARON OS.",
     "",
@@ -152,8 +165,9 @@ function demoResponse(prompt: string, language: AssistantLanguage) {
 export async function streamChatCompletion(
   messages: ChatMessage[],
   language: AssistantLanguage = "en",
+  context?: RuntimeContext,
 ): Promise<ReadableStream<Uint8Array>> {
-  const prompt = messagesToPrompt(messages, language);
+  const prompt = messagesToPrompt(messages, language, context);
 
   if (!hasGeminiKey()) {
     return createTextStream(demoResponse(messages.at(-1)?.content ?? "Open HARON OS", language));
@@ -203,7 +217,7 @@ export async function streamChatCompletion(
      * If streaming fails, use standard completion as backup
      */
     console.error("[HARON OS Gemini streaming fallback]", error);
-    const fallbackText = getFallbackResponse("chat");
+    const fallbackText = formatGeminiError(error, language) || getFallbackResponse("chat");
     return createTextStream(fallbackText);
   }
 }

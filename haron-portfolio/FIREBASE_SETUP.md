@@ -70,7 +70,7 @@ NEXT_PUBLIC_FIREBASE_STORAGE_EMULATOR_URL=localhost:9199
 
 ### Step 5: Add Security Rules
 1. Go to **Firestore Database → Rules**
-2. Paste rules from `FIREBASE_SECURITY_RULES.md`
+2. Paste or deploy rules from `firestore.rules`
 3. Click **Publish**
 
 ### Step 6: Create Cloud Storage (optional)

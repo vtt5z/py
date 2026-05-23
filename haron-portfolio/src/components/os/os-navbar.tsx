@@ -7,6 +7,7 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 
 import { UserMenu } from "@/components/auth/user-menu";
+import { InstallButton } from "@/components/pwa/install-button";
 import { useLanguage } from "@/components/providers/language-provider";
 import { platformPages } from "@/lib/haron-os-content";
 
@@ -61,6 +62,7 @@ export function OSNavbar() {
           {lang === "en" ? "AR" : "EN"}
         </button>
         <div className="flex items-center gap-2">
+          <InstallButton />
           <UserMenu compact />
           <button
             type="button"
@@ -124,6 +126,7 @@ export function OSNavbar() {
           <div className="hidden lg:block">
             <UserMenu compact />
           </div>
+          <InstallButton compact />
         </div>
       </aside>
     </>

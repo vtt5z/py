@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" role="img" aria-label="HARON OS">
+  <defs>
+    <radialGradient id="glow" cx="50%" cy="42%" r="62%">
+      <stop offset="0%" stop-color="#164e63"/>
+      <stop offset="52%" stop-color="#06182a"/>
+      <stop offset="100%" stop-color="#02030a"/>
+    </radialGradient>
+  </defs>
+  <rect width="512" height="512" rx="116" fill="#02030a"/>
+  <circle cx="256" cy="256" r="184" fill="url(#glow)" stroke="#67e8f9" stroke-width="10"/>
+  <path d="M142 276h78v82h72V154h78v204" fill="none" stroke="#a5f3fc" stroke-width="38" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="372" cy="154" r="22" fill="#22d3ee"/>
+</svg>

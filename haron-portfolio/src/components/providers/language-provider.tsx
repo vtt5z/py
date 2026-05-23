@@ -10,11 +10,14 @@ import {
 } from "react";
 
 import { copy, type Language } from "@/lib/content";
+import { getTranslation, type TranslationKey } from "@/lib/translations";
+
+type TranslationFunction = ((key: TranslationKey) => string) & (typeof copy)[Language];
 
 type LanguageContextValue = {
   lang: Language;
   dir: "ltr" | "rtl";
-  t: (typeof copy)[Language];
+  t: TranslationFunction;
   toggleLanguage: () => void;
   setLanguage: (language: Language) => void;
 };
@@ -49,16 +52,20 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     () => setLang((current) => (current === "en" ? "ar" : "en")),
     [],
   );
+  const translate = useCallback(
+    (key: TranslationKey) => getTranslation(lang, key) ?? key,
+    [lang],
+  );
 
   const value = useMemo<LanguageContextValue>(
     () => ({
       lang,
       dir: lang === "ar" ? "rtl" : "ltr",
-      t: copy[lang],
+      t: Object.assign(translate, copy[lang]),
       toggleLanguage,
       setLanguage,
     }),
-    [lang, setLanguage, toggleLanguage],
+    [lang, setLanguage, toggleLanguage, translate],
   );
 
   return (
